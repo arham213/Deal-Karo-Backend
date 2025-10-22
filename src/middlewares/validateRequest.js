@@ -1,7 +1,6 @@
 import { failureResponse } from "../utils/response.js";
 
 export const validateRequest = (schemas) => (req, res, next) => {
-  // schemas = { body?: zodSchema, params?: zodSchema, query?: zodSchema }
 
   try {
     // Validate body

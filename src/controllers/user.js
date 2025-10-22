@@ -1,4 +1,4 @@
-import { createUser, verifyNumber, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers } from "../services/user.js";
+import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP } from "../services/user.js";
 import { failureResponseWithData, successResponse } from "../utils/response.js";
 
 export const GetAllDealers = async (req, res, next) => {
@@ -26,9 +26,7 @@ export const GetUserById = async (req, res, next) => {
 
 export const GetYourSelf = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-
-    const user = await getUserById(userId);
+    const user = await getUserById(req.user.id);
 
     return successResponse(res, "User fetched successfully", {user: user}, 200);
   } catch (error) {
@@ -38,23 +36,19 @@ export const GetYourSelf = async (req, res, next) => {
 
 export const Signup = async (req, res, next) => {
   try {
-    const userData = req.body;
+    await createUser(req.body);
 
-    const [userId, message] = await createUser(userData);
-
-    if (userId && message) return successResponse(res, message, {userId: userId} , 200);
-
-    return successResponse(res, 'Account created successfully. We have sent you an OTP please verify your number.', {userId: userId} , 201);
+    return successResponse(res, 'Account created successfully. Please Login.', null , 201);
   } catch (error) {
     next(error);
   }
 };
 
-export const VerifyNumber = async (req, res, next) => {
+export const VerifyEmail = async (req, res, next) => {
   try {
     const userData = req.body;
 
-    await verifyNumber(userData);
+    await verifyEmail(userData);
 
     return successResponse(res, 'Number verified successfully.', null , 200);
   } catch (error) {
@@ -64,9 +58,7 @@ export const VerifyNumber = async (req, res, next) => {
 
 export const ResendOTP = async (req, res, next) => {
   try {
-    const userId = req.params.userId;
-
-    await resendOTP(userId);
+    await resendOTP(req.body);
 
     return successResponse(res, 'OTP resent successfully. Please check your messages.', null , 200);
   } catch (error) {
@@ -76,9 +68,7 @@ export const ResendOTP = async (req, res, next) => {
 
 export const Login = async (req, res, next) => {
   try {
-    const userData = req.body;
-
-    const response = await loginUser(userData);
+    const response = await loginUser(req.body);
 
     if (!response.success) {
       return failureResponseWithData(res, response.error, { userId: response.userId }, response.statusCode);
@@ -87,7 +77,7 @@ export const Login = async (req, res, next) => {
     const data = {
       user: {
         id: response.user._id,
-        contactNo: response.user.contactNo,
+        email: response.user.email,
       },
       token: response.token
     }
@@ -100,11 +90,19 @@ export const Login = async (req, res, next) => {
 
 export const ForgotPassword = async (req, res, next) => {
   try {
-    const userId = req.user.id;
+    const userId = await sendResetPasswordOTP(req.body.email);
 
-    await sendResetPasswordOTP(userId);
+    return successResponse(res, "Password reset OTP has been sent to your number.", userId, 200);
+  } catch (error) {
+    next(error);
+  }
+}
 
-    return successResponse(res, "Password reset OTP has been sent to your number.", null, 200);
+export const VerifyResetPasswordOTP = async (req, res, next) => {
+  try {
+    const userId = await verifyResetPasswordOTP(req.body);
+
+    return successResponse(res, "OTP verified successfully", userId, 200);
   } catch (error) {
     next(error);
   }
@@ -112,11 +110,7 @@ export const ForgotPassword = async (req, res, next) => {
 
 export const ResetPassword = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-
-    const userData = req.body;
-
-    await resetPassword(userData, userId);
+    await resetPassword(req.body);
 
     return successResponse(res, "Password reset successfully", null, 200);
   } catch (error) {
@@ -126,11 +120,7 @@ export const ResetPassword = async (req, res, next) => {
 
 export const EditUser = async (req, res, next) => {
   try {
-    const userId = req.user.id;
-
-    const userData = req.body;
-
-    const user = await editUser(userId, userData);
+    const user = await editUser(userData);
 
     return successResponse(res, 'User info updated successfully', {user: user}, 200);
   } catch (error) {

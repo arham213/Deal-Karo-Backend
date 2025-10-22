@@ -6,10 +6,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
     contactNo: {
         type: String,
         required: true,
-        unique: true,
         match: /^[0-9]{10,15}$/
     },
     estateName: {
@@ -20,11 +24,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    isContactNoVerified: {
-        type: Boolean,
-        required: true,
-        default: false
-    },
     isAccountVerified: {
         type: Boolean,
         required: true,
@@ -33,18 +32,6 @@ const UserSchema = new mongoose.Schema({
     OTP: {
         code: {
             type: String
-        },
-        expiryTime: {
-            type: Date
-        }
-    },
-    lastOTPSentAt: {
-        type: Date,
-        default: null
-    },
-    resetPasswordOTP: {
-        code: {
-            type: String,
         },
         expiryTime: {
             type: Date
@@ -71,11 +58,6 @@ UserSchema.pre('save', async function (next) {
         // Hash OTP if modified
         if (this.isModified('OTP.code')) {
             this.OTP.code = await bcrypt.hash(this.OTP.code, 10);
-        }
-
-        // Hash resetPassword OTP
-        if (this.isModified('resetPasswordOTP.code')) {
-            this.resetPasswordOTP.code = await bcrypt.hash(this.resetPasswordOTP.code, 10);
         }
 
         next();

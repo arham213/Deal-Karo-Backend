@@ -16,9 +16,9 @@ export const errorHandler = (err, req, res, next) => {
     message = `${field} already exists. Please use a different one.`;
     statusCode = 400;
   } 
-  else if (err.message?.toLowerCase().includes("unauthorized")) {
+  else if (err.message?.toLowerCase().includes("unpropertyized")) {
     statusCode = 403;
-    message = "You are not authorized to perform this action.";
+    message = "You are not propertyized to perform this action.";
   } 
   else if (err.message?.toLowerCase().includes("token")) {
     statusCode = 401;
