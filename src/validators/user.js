@@ -90,7 +90,7 @@ export const resetPasswordSchema = z.object({
     .min(1, "userId is required")
     .regex(/^[0-9a-fA-F]{24}$/, "Invalid userId format"),
 
-    newPassword: z
+    password: z
     .string()
     .min(6, 'Password must be at least 6 characters long')
     .max(100, 'Password is too long')

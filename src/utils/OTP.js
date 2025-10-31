@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 
 export const generateOTP = () => {
-    const OTP = String(Math.floor(100000 + Math.random() * 900000));
+  const OTP = String(Math.floor(1000 + Math.random() * 9000));
+  return OTP;
+};
 
-    return OTP;
-}
 
 export const verifyOTP = async (sentOTP, storedOTP) => {
     const expiryTime = storedOTP.expiryTime;

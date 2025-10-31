@@ -24,7 +24,7 @@ UserRouter.post('/verifyEmail', validateRequest({ body: verifyEmailSchema }), Ve
 UserRouter.post('/resendOTP', resendOTPLimiter, validateRequest({ body: resendOTPSchema }), ResendOTP);
 
 // User Login
-UserRouter.post('/login', validateRequest({ body: loginSchema }), Login);
+UserRouter.post('/signin', validateRequest({ body: loginSchema }), Login);
 
 // User Forgot Password
 UserRouter.post('/forgotPassword', validateRequest({ body: forgotPasswordSchema }), ForgotPassword);

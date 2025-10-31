@@ -4,6 +4,8 @@ import { failureResponseWithData, successResponse } from "../utils/response.js";
 export const GetAllDealers = async (req, res, next) => {
   try {
 
+    console.log('Get Dealers API called');
+
     const dealers = await getAllDealers();
 
     return successResponse(res, "Dealers fetched successfully", {dealers: dealers}, 200);
@@ -35,6 +37,7 @@ export const GetYourSelf = async (req, res, next) => {
 }
 
 export const Signup = async (req, res, next) => {
+  console.log('Signup API Called');
   try {
     await createUser(req.body);
 
@@ -50,13 +53,14 @@ export const VerifyEmail = async (req, res, next) => {
 
     await verifyEmail(userData);
 
-    return successResponse(res, 'Number verified successfully.', null , 200);
+    return successResponse(res, 'Email verified successfully.', null , 200);
   } catch (error) {
     next(error);
   }
 }
 
 export const ResendOTP = async (req, res, next) => {
+  console.log('Resend OTP API called');
   try {
     await resendOTP(req.body);
 
@@ -82,7 +86,7 @@ export const Login = async (req, res, next) => {
       token: response.token
     }
 
-    return successResponse(res, "User logged in successfully", data, 200);
+    return successResponse(res, "User signed in successfully", data, 200);
   } catch (error) {
     next(error);
   }
@@ -92,7 +96,7 @@ export const ForgotPassword = async (req, res, next) => {
   try {
     const userId = await sendResetPasswordOTP(req.body.email);
 
-    return successResponse(res, "Password reset OTP has been sent to your number.", userId, 200);
+    return successResponse(res, "Password reset OTP has been sent to your email.", { userId }, 200);
   } catch (error) {
     next(error);
   }
@@ -102,7 +106,7 @@ export const VerifyResetPasswordOTP = async (req, res, next) => {
   try {
     const userId = await verifyResetPasswordOTP(req.body);
 
-    return successResponse(res, "OTP verified successfully", userId, 200);
+    return successResponse(res, "OTP verified successfully",  { userId }, 200);
   } catch (error) {
     next(error);
   }

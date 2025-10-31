@@ -44,6 +44,7 @@ export const verifyEmail = async (userData) => {
 }
 
 export const resendOTP = async (userData) => {
+  console.log('userData:', userData);
   const user = await User.findById(userData.userId);
 
   if (!user) throw new AppError("User not found. Please signup first.", 404);
@@ -90,6 +91,10 @@ export const verifyResetPasswordOTP = async (userData) => {
 
   await verifyOTP(userData.OTP, user.OTP);
 
+  user.isResetPasswordOTPVerified = true;
+
+  await user.save();
+
   return user._id;
 }
 
@@ -97,8 +102,12 @@ export const resetPassword = async (userData) => {
   const user = await User.findById(userData.userId);
 
   if (!user) throw new AppError("Account does not exist. Please signup first.", 404);
+
+  if (!user.isResetPasswordOTPVerified) throw new AppError("Invalid reset password request. Kindly verify the reset password OTP first.")
   
-  user.password = userData.newPassword;
+  user.password = userData.password;
+
+  user.isResetPasswordOTPVerified = false;
 
   await user.save();
 }

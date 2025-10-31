@@ -41,6 +41,10 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    isResetPasswordOTPVerified: {
+        type: Boolean,
+        default: false
+    },
     role: {
         type: 'String',
         enum: ['dealer', 'admin'],
