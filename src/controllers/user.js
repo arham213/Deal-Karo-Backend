@@ -4,8 +4,6 @@ import { failureResponseWithData, successResponse } from "../utils/response.js";
 export const GetAllDealers = async (req, res, next) => {
   try {
 
-    console.log('Get Dealers API called');
-
     const dealers = await getAllDealers();
 
     return successResponse(res, "Dealers fetched successfully", {dealers: dealers}, 200);
@@ -37,7 +35,6 @@ export const GetYourSelf = async (req, res, next) => {
 }
 
 export const Signup = async (req, res, next) => {
-  console.log('Signup API Called');
   try {
     await createUser(req.body);
 
@@ -60,7 +57,6 @@ export const VerifyEmail = async (req, res, next) => {
 }
 
 export const ResendOTP = async (req, res, next) => {
-  console.log('Resend OTP API called');
   try {
     await resendOTP(req.body);
 
@@ -79,10 +75,7 @@ export const Login = async (req, res, next) => {
     }
 
     const data = {
-      user: {
-        id: response.user._id,
-        email: response.user.email,
-      },
+      user: response.user,
       token: response.token
     }
 

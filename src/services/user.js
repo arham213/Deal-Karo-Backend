@@ -67,7 +67,7 @@ export const loginUser = async (userData) => {
 
     const token = generateToken(user);
 
-    const { password, ...userWithoutPasssword } = user.toObject();
+    const { password, OTP, lastResetPasswordOTPSentAt, isResetPasswordOTPVerified, ...userWithoutPasssword } = user.toObject();
 
     return { success: true, user: userWithoutPasssword, token: token };
 }

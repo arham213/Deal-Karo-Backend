@@ -14,7 +14,10 @@ export const updateNoteSchema = z.object({
 
     description: z
     .string()
-    .min(1, "Descripiton is required")
+    .min(1, "Descripiton is required"),
+
+    completed: z
+    .boolean()
 }).strict()
 
 export const noteIdParamsSchema = z.object({

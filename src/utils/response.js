@@ -7,7 +7,6 @@ export const successResponse = (res, message, data, statusCode = 200) => {
 }
 
 export const failureResponse = (res, err, statusCode) => {
-    console.log('err:', err, 'statusCode:', statusCode);
     return res.status(statusCode).json({
         success: false,
         error: {

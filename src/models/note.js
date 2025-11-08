@@ -5,11 +5,10 @@ const NoteSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    status: {
-        type: String,
+    completed: {
+        type: Boolean,
         required: true,
-        enum: ['pending', 'done'],
-        default: 'pending'
+        default: false
     }
 }, { timestamps: true })
 

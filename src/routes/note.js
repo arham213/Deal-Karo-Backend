@@ -12,7 +12,7 @@ NoteRouter.get('/', GetAllNotes);
 NoteRouter.get('/:noteId', validateRequest({ params: noteIdParamsSchema}), GetNoteById);
 
 // Create a new Note
-NoteRouter.post('/', validateRequest({ body: createNoteSchema }), CreateNote);
+NoteRouter.post('/', CreateNote);
 
 // Update a Note by ID
 NoteRouter.put('/', validateRequest({ body: updateNoteSchema }), UpdateNote);
