@@ -1,10 +1,11 @@
 import express from 'express';
 import { validateRequest } from '../middlewares/validateRequest.js';
-import { loginSchema, signupSchema, editUserSchema, userIdParamsSchema, verifyEmailSchema, forgotPasswordSchema, resetPasswordSchema, verifyResetPasswordOTPSchema, resendOTPSchema } from '../validators/user.js';
-import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP } from '../controllers/user.js';
+import { loginSchema, signupSchema, editUserSchema, userIdParamsSchema, verifyEmailSchema, forgotPasswordSchema, resetPasswordSchema, verifyResetPasswordOTPSchema, resendOTPSchema, adminSignupSchema } from '../validators/user.js';
+import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats } from '../controllers/user.js';
 import { resendOTPLimiter } from '../middlewares/rateLimiter.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.js";
+import { User } from '../models/index.js';
 
 const UserRouter = express.Router();
 
@@ -14,8 +15,20 @@ UserRouter.get('/dealers', authMiddleware, authorizeRoles("admin"), GetAllDealer
 // Get YourSelf
 UserRouter.get('/', authMiddleware, GetYourSelf);
 
+// Get Stats
+UserRouter.get('/stats', authMiddleware, authorizeRoles("admin"), GetStats)
+
 // User Signup
 UserRouter.post('/signup', validateRequest({ body: signupSchema }), Signup);
+
+// Admin Signup
+UserRouter.post('/admin/signup', validateRequest({ body: adminSignupSchema }), AdminSignup);
+
+// Verify User Account
+UserRouter.put('/verifyAccount/:userId', authMiddleware, authorizeRoles("admin"), VerifyAccount);
+
+// Verify All User Accounts
+UserRouter.put('/verifyAllAccounts', authMiddleware, authorizeRoles("admin"), VerifyAllAccounts);
 
 // User Email Verification
 UserRouter.post('/verifyEmail', validateRequest({ body: verifyEmailSchema }), VerifyEmail);

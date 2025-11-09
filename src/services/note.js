@@ -1,8 +1,31 @@
 import { Note } from "../models/index.js";
 import { AppError } from "../utils/AppError.js";
 
-export const getAllNotes = async () => {
-    const notes = await Note.find().sort({ createdAt: -1 });
+export const getAllNotes = async (page = 1, limit = 10) => {
+    // Ensure page and limit are integers
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+
+    // Calculate pagination
+    const skip = (pageNum - 1) * limitNum;
+    const notes = await Note.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean();
+
+    // Get total count for pagination
+    const total = notes?.length || 0;
+
+    return {
+        notes,
+        pagination: {
+            total,
+            page: pageNum,
+            limit: limitNum,
+            totalPages: Math.ceil(total / limitNum)
+        }
+    };
 
     return notes;
 }

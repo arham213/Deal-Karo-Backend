@@ -7,27 +7,107 @@ import { AppError } from "../utils/AppError.js";
 
 const OTP_EXPIRY_MIN = 10;
 
-export const getAllDealers = async () => {
-  const dealers = await User.find({ role: 'dealer' }).select("-passowrd -OTP -lastResetPasswordOTPSentAt");
+export const getAllDealers = async (page = 1, limit = 10) => {
+  // Ensure page and limit are integers
+  const pageNum = parseInt(page) || 1;
+  const limitNum = parseInt(limit) || 10;
 
-  return dealers;
+  // Calculate pagination
+  const skip = (pageNum - 1) * limitNum;
+
+  const dealers = await User.find({ role: 'dealer' })
+    .select("-passowrd -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitNum)
+    .lean();
+
+  // Get total count for pagination
+    const total = dealers?.length || 0;
+
+    return {
+        dealers,
+        pagination: {
+            total,
+            page: pageNum,
+            limit: limitNum,
+            totalPages: Math.ceil(total / limitNum)
+        }
+    };
 }
 
 export const getUserById = async (userId) => {
-  const user = await User.findById(userId).select("-password -OTP -lastResetPasswordOTPSentAt")
+  const user = await User.findById(userId)
+    .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified")
+    .lean()
 
   if (!user) throw new AppError("User not found", 404);
 
   return user;
 }
 
-export const createUser = async (userData) => {
-  const user = await User.findOne({ email: userData.email })
+export const getStats = async () => {
+  const allUsers = await User.find({ role: "dealer" });
 
-  if (user) throw new AppError("Account with this email already exists. Please Login.", 409);
+  const verifiedUsers = await User.find({ role: "dealer", isAccountVerified: true });
+
+  const stats = {
+    totalUsers: allUsers?.length || 0,
+    verifiedUsers: verifiedUsers?.length || 0,
+    unverifiedUsers: (allUsers?.length - verifiedUsers?.length) || 0
+  }
+
+  return stats;
+}
+
+export const createUser = async (userData) => {
+  const user = await User.findOne({ email: userData.email, role: "dealer" })
+
+  if (user) throw new AppError("User with this email already exists. Please Login.", 409);
 
   await User.create(userData);
 };
+
+export const createAdmin = async (userData) => {
+  const user = await User.findOne({ email: userData.email, role: "admin" })
+
+  if (user) throw new AppError("Admin with this email already exists. Please Login.", 409);
+
+  const { adminSecret, name, email, contactNo, estateName, password, isAccountVerified } = userData;
+
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    throw new AppError("Unauthorized", 403);
+  }
+
+  await User.create({
+    name,
+    email,
+    contactNo,
+    estateName,
+    password,
+    role: "admin",
+    isAccountVerified: isAccountVerified ?? true,
+  });
+};
+
+export const verifyAccount = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) throw new AppError('User not fouund.', 404);
+
+  user.isAccountVerified = true;
+
+  await user.save();
+}
+
+export const verifyAllAccounts = async () => {
+  const users = await User.find({ isAccountVerified: false });
+
+  users?.forEach(async (user) => {
+    user.isAccountVerified = true;
+    await user.save();
+  })
+}
 
 export const verifyEmail = async (userData) => {
     const user = await User.findOne({_id: userData.userId});
@@ -118,7 +198,8 @@ export const editUser = async (userData) => {
     userData, 
     {new: true, runValidators: true}
   )
-  .select("-password -OTP -lastResetPasswordOTPSentAt")
+  .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified")
+  .lean()
 
   if (!user) throw new AppError("Account not found", 404);
 

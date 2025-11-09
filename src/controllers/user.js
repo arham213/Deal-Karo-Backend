@@ -1,12 +1,20 @@
-import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP } from "../services/user.js";
+import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats } from "../services/user.js";
 import { failureResponseWithData, successResponse } from "../utils/response.js";
 
 export const GetAllDealers = async (req, res, next) => {
   try {
+    const { page, limit } = req.query;
+    const result = await getAllDealers(page, limit);
 
-    const dealers = await getAllDealers();
-
-    return successResponse(res, "Dealers fetched successfully", {dealers: dealers}, 200);
+    return successResponse(
+      res,
+      "Properties fetched successfully",
+      {
+        dealers: result.dealers,
+        pagination: result.pagination,
+      },
+      200
+    );
   } catch (error) {
     next(error);
   }
@@ -34,6 +42,16 @@ export const GetYourSelf = async (req, res, next) => {
   }
 }
 
+export const GetStats = async (req, res, next) => {
+  try {
+    const stats = await getStats();
+
+    return successResponse(res, "Stats fetched successfully", { stats }, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export const Signup = async (req, res, next) => {
   try {
     await createUser(req.body);
@@ -43,6 +61,34 @@ export const Signup = async (req, res, next) => {
     next(error);
   }
 };
+
+export const AdminSignup = async (req, res, next) => {
+  try {
+    await createAdmin(req.body)
+    return successResponse(res, 'Account created successfully. Please Login.', null , 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const VerifyAccount = async (req, res, next) => {
+  try {
+    await verifyAccount(req.params.userId);
+    return successResponse(res, 'Account verified successfully. Please Login.', 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const VerifyAllAccounts = async (req, res, next) => {
+  try {
+    await verifyAllAccounts();
+    return successResponse(res, 'All accounts verified successfully. Please Login.', 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
 
 export const VerifyEmail = async (req, res, next) => {
   try {
@@ -126,5 +172,11 @@ export const EditUser = async (req, res, next) => {
 }
 
 export const DeleteUser = async (req, res, next) => {
-  
+  try {
+    const user = await editUser(userData);
+
+    return successResponse(res, 'User info updated successfully', {user: user}, 200);
+  } catch (error) {
+    next(error);
+  }
 }

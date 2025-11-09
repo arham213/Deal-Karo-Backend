@@ -9,7 +9,7 @@ export const signupSchema = z.object({
     email: z
     .string()
     .min(1, "Email is required")
-    .email(),
+    .email("Invalid email format"),
 
     contactNo: z
     .string()
@@ -25,8 +25,41 @@ export const signupSchema = z.object({
     .min(6, 'Password must be at least 6 characters long')
     .max(100, 'Password is too long'),
 
-    role: z
-    .enum(['dealer', 'admin'])
+    role: z.literal("dealer")
+}).strict();
+
+export const adminSignupSchema = z.object({
+  adminSecret: z
+    .string()
+    .min(1, "Admin Secret is required"),
+
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name cannot exceed 100 characters"),
+
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Invalid email format"),
+
+  contactNo: z
+    .string()
+    .regex(/^[0-9]{10,15}$/, "Contact number must be 10–15 digits"),
+
+  estateName: z
+    .string()
+    .min(1, "Estate Name is required")
+    .max(100, "Estate Name cannot exceed 100 characters"),
+
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters long")
+    .max(100, "Password is too long"),
+
+  role: z.literal("admin"), // ✅ more precise than enum(["admin"])
+
+  isAccountVerified: z.boolean().optional(),
 }).strict();
 
 export const verifyEmailSchema = z.object({

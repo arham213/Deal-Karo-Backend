@@ -9,8 +9,18 @@ import { successResponse } from "../utils/response.js";
 
 export const GetAllNotes = async (req, res, next) => {
   try {
-    const notes = await getAllNotes();
-    return successResponse(res, "Notes fetched successfully", { notes }, 200);
+    const { page, limit } = req.query;
+    const result = await getAllNotes(page, limit);
+    // return successResponse(res, "Notes fetched successfully", { notes }, 200);
+    return successResponse(
+      res,
+      "Properties fetched successfully",
+      {
+        notes: result.notes,
+        pagination: result.pagination,
+      },
+      200
+    );
   } catch (error) {
     next(error);
   }
