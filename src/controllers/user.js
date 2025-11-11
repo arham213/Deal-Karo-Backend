@@ -1,4 +1,4 @@
-import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats } from "../services/user.js";
+import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount } from "../services/user.js";
 import { failureResponseWithData, successResponse } from "../utils/response.js";
 
 export const GetAllDealers = async (req, res, next) => {
@@ -74,7 +74,7 @@ export const AdminSignup = async (req, res, next) => {
 export const VerifyAccount = async (req, res, next) => {
   try {
     await verifyAccount(req.params.userId);
-    return successResponse(res, 'Account verified successfully. Please Login.', 201);
+    return successResponse(res, 'Account verified successfully.', 201);
   } catch (error) {
     next(error);
   }
@@ -83,7 +83,16 @@ export const VerifyAccount = async (req, res, next) => {
 export const VerifyAllAccounts = async (req, res, next) => {
   try {
     await verifyAllAccounts();
-    return successResponse(res, 'All accounts verified successfully. Please Login.', 201);
+    return successResponse(res, 'All accounts verified successfully.', 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const RejectAccount = async (req, res, next) => {
+  try {
+    await rejectAccount(req.params.userId);
+    return successResponse(res, 'Account rejected successfully', 201);
   } catch (error) {
     next(error);
   }

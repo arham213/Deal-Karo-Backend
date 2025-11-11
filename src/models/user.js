@@ -23,10 +23,16 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    isAccountVerified: {
-        type: Boolean,
+    // isAccountVerified: {
+    //     type: Boolean,
+    //     required: true,
+    //     default: false
+    // },
+    verificationStatus: {
+        type: String,
         required: true,
-        default: false
+        enum: ["verified", "pending", "rejected"],
+        default: "pending"
     },
     OTP: {
         code: {

@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateRequest } from '../middlewares/validateRequest.js';
 import { loginSchema, signupSchema, editUserSchema, userIdParamsSchema, verifyEmailSchema, forgotPasswordSchema, resetPasswordSchema, verifyResetPasswordOTPSchema, resendOTPSchema, adminSignupSchema } from '../validators/user.js';
-import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats } from '../controllers/user.js';
+import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount } from '../controllers/user.js';
 import { resendOTPLimiter } from '../middlewares/rateLimiter.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.js";
@@ -13,7 +13,7 @@ const UserRouter = express.Router();
 UserRouter.get('/dealers', authMiddleware, authorizeRoles("admin"), GetAllDealers);
 
 // Get YourSelf
-UserRouter.get('/', authMiddleware, GetYourSelf);
+UserRouter.get('/me', authMiddleware, GetYourSelf);
 
 // Get Stats
 UserRouter.get('/stats', authMiddleware, authorizeRoles("admin"), GetStats)
@@ -29,6 +29,9 @@ UserRouter.put('/verifyAccount/:userId', authMiddleware, authorizeRoles("admin")
 
 // Verify All User Accounts
 UserRouter.put('/verifyAllAccounts', authMiddleware, authorizeRoles("admin"), VerifyAllAccounts);
+
+// Reject User Account
+UserRouter.put('/reject/:userId', authMiddleware, authorizeRoles("admin"), RejectAccount)
 
 // User Email Verification
 UserRouter.post('/verifyEmail', validateRequest({ body: verifyEmailSchema }), VerifyEmail);

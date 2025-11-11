@@ -1,14 +1,14 @@
 import { Note } from "../models/index.js";
 import { AppError } from "../utils/AppError.js";
 
-export const getAllNotes = async (page = 1, limit = 10) => {
+export const getAllNotes = async (page = 1, limit = 10, userId) => {
     // Ensure page and limit are integers
     const pageNum = parseInt(page) || 1;
     const limitNum = parseInt(limit) || 10;
 
     // Calculate pagination
     const skip = (pageNum - 1) * limitNum;
-    const notes = await Note.find()
+    const notes = await Note.find({ userId: userId })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)

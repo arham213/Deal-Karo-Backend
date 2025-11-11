@@ -49,7 +49,8 @@ export const getUserById = async (userId) => {
 export const getStats = async () => {
   const allUsers = await User.find({ role: "dealer" });
 
-  const verifiedUsers = await User.find({ role: "dealer", isAccountVerified: true });
+  // const verifiedUsers = await User.find({ role: "dealer", isAccountVerified: true });
+  const verifiedUsers = await User.find({ role: "dealer", verificationStatus: "verified" });
 
   const stats = {
     totalUsers: allUsers?.length || 0,
@@ -95,8 +96,9 @@ export const verifyAccount = async (userId) => {
 
   if (!user) throw new AppError('User not fouund.', 404);
 
-  user.isAccountVerified = true;
+  // user.isAccountVerified = true;
 
+  user.verificationStatus = "verified";
   await user.save();
 }
 
@@ -104,9 +106,21 @@ export const verifyAllAccounts = async () => {
   const users = await User.find({ isAccountVerified: false });
 
   users?.forEach(async (user) => {
-    user.isAccountVerified = true;
+    // user.isAccountVerified = true;
+    user.verificationStatus = "verified";
     await user.save();
   })
+}
+
+export const rejectAccount = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) throw new AppError('User not fouund.', 404);
+
+  // user.isAccountVerified = true;
+
+  user.verificationStatus = "rejected";
+  await user.save();
 }
 
 export const verifyEmail = async (userData) => {

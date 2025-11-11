@@ -9,8 +9,8 @@ import { successResponse } from "../utils/response.js";
 
 export const GetAllNotes = async (req, res, next) => {
   try {
-    const { page, limit } = req.query;
-    const result = await getAllNotes(page, limit);
+    const { page, limit, } = req.query;
+    const result = await getAllNotes(page, limit, req.user.id);
     // return successResponse(res, "Notes fetched successfully", { notes }, 200);
     return successResponse(
       res,
