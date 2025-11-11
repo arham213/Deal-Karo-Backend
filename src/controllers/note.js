@@ -37,7 +37,7 @@ export const GetNoteById = async (req, res, next) => {
 
 export const CreateNote = async (req, res, next) => {
   try {
-    const note = await createNote(req.body);
+    const note = await createNote(req.body, req.user.id);
     return successResponse(res, "Note created successfully", { note }, 201);
   } catch (error) {
     next(error);
