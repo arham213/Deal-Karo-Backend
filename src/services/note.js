@@ -39,7 +39,7 @@ export const getNoteById = async (noteId) => {
 }
 
 export const createNote = async (noteData, userId) => {
-    const newNote = await Note.create({userId, ...noteData});
+    const newNote = await Note.create({userId, ...curnoteData});
 
     return newNote;
 }
