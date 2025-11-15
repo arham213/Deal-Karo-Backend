@@ -12,6 +12,10 @@ app.use(express.json());
 // routes
 app.use('/api', router);
 
+app.get('/', (req, res) => {
+  res.send('Welcome to Deal Karo Backend');
+});
+
 // error handler middleware
 app.use(errorHandler);
 
