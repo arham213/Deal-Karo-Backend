@@ -74,7 +74,7 @@ export const createAdmin = async (userData) => {
 
   if (user) throw new AppError("Admin with this email already exists. Please Login.", 409);
 
-  const { adminSecret, name, email, contactNo, estateName, password, isAccountVerified } = userData;
+  const { adminSecret, name, email, contactNo, estateName, password, verificationStatus } = userData;
 
   if (adminSecret !== process.env.ADMIN_SECRET) {
     throw new AppError("Unauthorized", 403);
@@ -87,7 +87,7 @@ export const createAdmin = async (userData) => {
     estateName,
     password,
     role: "admin",
-    isAccountVerified: isAccountVerified ?? true,
+    verificationStatus
   });
 };
 

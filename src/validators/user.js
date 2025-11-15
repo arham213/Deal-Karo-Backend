@@ -59,7 +59,7 @@ export const adminSignupSchema = z.object({
 
   role: z.literal("admin"), // ✅ more precise than enum(["admin"])
 
-  isAccountVerified: z.boolean().optional(),
+  verificationStatus: z.enum(["verified", "pending", "rejected"]).optional()
 }).strict();
 
 export const verifyEmailSchema = z.object({
