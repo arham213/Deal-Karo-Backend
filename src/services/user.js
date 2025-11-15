@@ -96,9 +96,8 @@ export const verifyAccount = async (userId) => {
 
   if (!user) throw new AppError('User not fouund.', 404);
 
-  // user.isAccountVerified = true;
-
   user.verificationStatus = "verified";
+
   await user.save();
 }
 
@@ -106,7 +105,6 @@ export const verifyAllAccounts = async () => {
   const users = await User.find({ isAccountVerified: false });
 
   users?.forEach(async (user) => {
-    // user.isAccountVerified = true;
     user.verificationStatus = "verified";
     await user.save();
   })
@@ -117,9 +115,8 @@ export const rejectAccount = async (userId) => {
 
   if (!user) throw new AppError('User not fouund.', 404);
 
-  // user.isAccountVerified = true;
-
   user.verificationStatus = "rejected";
+
   await user.save();
 }
 
@@ -207,17 +204,23 @@ export const resetPassword = async (userData) => {
 }
 
 export const editUser = async (userData) => {
-  const user = await User.findByIdAndUpdate(
-    userData.userId, 
+  const user = await User.findOne({ email: userData.email});
+
+  if (user) throw new AppError("User with this email already exists", 404);
+
+  console.log('userData in service:', userData);
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userData._id,
     userData, 
     {new: true, runValidators: true}
   )
   .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified")
   .lean()
 
-  if (!user) throw new AppError("Account not found", 404);
+  if (!updatedUser) throw new AppError("Account not found", 404);
 
-  return user;
+  return updatedUser;
 };
 
 const generateOTPUpdateUserAndSendEmail = async (user, isSimpleOTP) => {

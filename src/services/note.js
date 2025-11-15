@@ -1,7 +1,7 @@
 import { Note } from "../models/index.js";
 import { AppError } from "../utils/AppError.js";
 
-export const getAllNotes = async (page = 1, limit = 10, userId) => {
+export const getNotesByUserId = async (page = 1, limit = 10, userId) => {
     // Ensure page and limit are integers
     const pageNum = parseInt(page) || 1;
     const limitNum = parseInt(limit) || 10;
@@ -39,7 +39,7 @@ export const getNoteById = async (noteId) => {
 }
 
 export const createNote = async (noteData, userId) => {
-    const newNote = await Note.create({userId, ...curnoteData});
+    const newNote = await Note.create({userId, ...noteData});
 
     return newNote;
 }

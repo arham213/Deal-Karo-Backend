@@ -5,7 +5,6 @@ import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOT
 import { resendOTPLimiter } from '../middlewares/rateLimiter.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.js";
-import { User } from '../models/index.js';
 
 const UserRouter = express.Router();
 
@@ -55,6 +54,6 @@ UserRouter.post('/resetPassword', validateRequest({ body: resetPasswordSchema })
 UserRouter.put('/', authMiddleware, validateRequest({ body: editUserSchema }), EditUser);
 
 // Remove User By Id
-UserRouter.delete('/:userId', authMiddleware, validateRequest({ params: userIdParamsSchema }), DeleteUser);
+// UserRouter.delete('/:userId', authMiddleware, validateRequest({ params: userIdParamsSchema }), DeleteUser);
 
 export default UserRouter;

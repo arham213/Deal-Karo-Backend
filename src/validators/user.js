@@ -130,7 +130,7 @@ export const resetPasswordSchema = z.object({
 }).strict();
 
 export const editUserSchema = z.object({
-    userId: z
+    _id: z
     .string()
     .min(1, "userId is required")
     .regex(/^[0-9a-fA-F]{24}$/, "Invalid userId format"),
@@ -144,11 +144,19 @@ export const editUserSchema = z.object({
     email: z
     .string()
     .min(1, "Email is required")
-    .email(),
+    .email()
+    .optional(),
 
     contactNo: z
     .string()
     .regex(/^[0-9]{10,15}$/, 'Contact number must be 10–15 digits')
+    .optional(),
+
+    estateName: z
+    .string()
+    .min(1, 'Estate Name is required')
+    .max(100, 'Estate Name cannot exceed 100 characters')
+    .optional()
 }).strict();
 
 export const userIdParamsSchema = z.object({

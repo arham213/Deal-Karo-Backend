@@ -172,7 +172,7 @@ export const ResetPassword = async (req, res, next) => {
 
 export const EditUser = async (req, res, next) => {
   try {
-    const user = await editUser(userData);
+    const user = await editUser(req.body);
 
     return successResponse(res, 'User info updated successfully', {user: user}, 200);
   } catch (error) {

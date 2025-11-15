@@ -40,5 +40,7 @@ export const errorHandler = (err, req, res, next) => {
     message = err.message; // custom user-defined messages like "Invalid OTP"
   }
 
+  console.log(`[ERROR HANDLER] Responding with ${statusCode}: ${message}`);
+
   return failureResponse(res, { message }, statusCode);
 };
