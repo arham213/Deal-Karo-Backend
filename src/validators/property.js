@@ -77,7 +77,7 @@ export const createPropertySchema = z
     installment: z
       .object({
         perMonth: z.number().optional(),
-        quarterly: z.number().optional(),
+        halfYearly: z.number().optional(),
       })
       .optional(),
   })
@@ -124,9 +124,9 @@ export const createPropertySchema = z
       d.listingType !== "installments" ||
       (d.installment &&
         typeof d.installment.perMonth === "number" &&
-        typeof d.installment.quarterly === "number"),
+        typeof d.installment.halfYearly === "number"),
     {
-      message: "installment.perMonth and installment.quarterly are required numbers for 'installments' listingType",
+      message: "installment.perMonth and installment.halfYearly are required numbers for 'installments' listingType",
       path: ["installment"],
     }
   )
@@ -175,9 +175,9 @@ export const updatePropertySchema = createPropertySchema
       d.listingType !== "installments" ||
       (d.installment &&
         typeof d.installment.perMonth === "number" &&
-        typeof d.installment.quarterly === "number"),
+        typeof d.installment.halfYearly === "number"),
     {
-      message: "installment.perMonth and installment.quarterly are required numbers when listingType is 'installments'",
+      message: "installment.perMonth and installment.halfYearly are required numbers when listingType is 'installments'",
       path: ["installment"],
     }
   )

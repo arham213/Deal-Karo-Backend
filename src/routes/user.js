@@ -18,7 +18,7 @@ UserRouter.get('/me', authMiddleware, GetYourSelf);
 UserRouter.get('/stats', authMiddleware, authorizeRoles("admin"), GetStats)
 
 // User Signup
-UserRouter.post('/signup', validateRequest({ body: signupSchema }), Signup);
+UserRouter.post('/signup', Signup);
 
 // Admin Signup
 UserRouter.post('/admin/signup', validateRequest({ body: adminSignupSchema }), AdminSignup);

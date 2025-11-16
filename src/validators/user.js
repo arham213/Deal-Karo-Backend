@@ -24,8 +24,6 @@ export const signupSchema = z.object({
     .string()
     .min(6, 'Password must be at least 6 characters long')
     .max(100, 'Password is too long'),
-
-    role: z.literal("dealer")
 }).strict();
 
 export const adminSignupSchema = z.object({
@@ -57,16 +55,14 @@ export const adminSignupSchema = z.object({
     .min(6, "Password must be at least 6 characters long")
     .max(100, "Password is too long"),
 
-  role: z.literal("admin"), // ✅ more precise than enum(["admin"])
-
   verificationStatus: z.enum(["verified", "pending", "rejected"]).optional()
 }).strict();
 
 export const verifyEmailSchema = z.object({
-    email: z
+    userId: z
     .string()
-    .min(1, "Email is required")
-    .email(),
+    .min(1, "userId is required")
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid userId format"),
 
     OTP: z
     .string()
@@ -156,7 +152,13 @@ export const editUserSchema = z.object({
     .string()
     .min(1, 'Estate Name is required')
     .max(100, 'Estate Name cannot exceed 100 characters')
-    .optional()
+    .optional(),
+
+    onBoardingCompleted: z
+    .boolean({
+        invalid_type_error: "onBoardingCompleted must be a boolean",
+    })
+    .optional(),
 }).strict();
 
 export const userIdParamsSchema = z.object({

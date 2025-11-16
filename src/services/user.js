@@ -16,7 +16,7 @@ export const getAllDealers = async (page = 1, limit = 10) => {
   const skip = (pageNum - 1) * limitNum;
 
   const dealers = await User.find({ role: 'dealer' })
-    .select("-passowrd -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified")
+    .select("-passowrd -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified -isEmailVerified")
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limitNum)
@@ -38,7 +38,7 @@ export const getAllDealers = async (page = 1, limit = 10) => {
 
 export const getUserById = async (userId) => {
   const user = await User.findById(userId)
-    .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified")
+    .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified -isEmailVerified")
     .lean()
 
   if (!user) throw new AppError("User not found", 404);
@@ -62,12 +62,46 @@ export const getStats = async () => {
 }
 
 export const createUser = async (userData) => {
-  const user = await User.findOne({ email: userData.email, role: "dealer" })
+  const oldUser = await User.findOne({ email: userData.email, role: "dealer" })
 
-  if (user) throw new AppError("User with this email already exists. Please Login.", 409);
+  if (oldUser) throw new AppError("User with this email already exists. Please Login.", 409);
 
-  await User.create(userData);
+  // await User.create(userData);
+  const code = generateOTP();
+  const OTP = {
+    code: code,
+    expiryTime: new Date(Date.now() + OTP_EXPIRY_MIN * 60 * 1000)
+  };
+
+  const user = await User.create({...userData, OTP});
+
+  await sendEmail(userData.email, 'Email Verification', `Please verify your email\nYour OTP is: ${code}`);
+
+  const lastOTPSentAt = new Date();
+  user.lastOTPSentAt = lastOTPSentAt;
+  await user.save();
+
+  return user._id;
 };
+
+// export const createUser = async (userData) => {
+//   const userExists = await User.findOne({ email: userData.email })
+
+//   if (userExists) {
+//     throw new Error("User with this email already exists");
+//   }
+
+//   const code = OTPGenerator();
+//   const OTP = {
+//     code: code,
+//   };
+
+//   const user = await User.create({...userData, OTP});
+
+//   await sendEmail(userData.email, 'Email Verification', `Please verify your email\nYour OTP is: ${code}`);
+
+//   return user._id;
+// };
 
 export const createAdmin = async (userData) => {
   const user = await User.findOne({ email: userData.email, role: "admin" })
@@ -121,7 +155,9 @@ export const rejectAccount = async (userId) => {
 }
 
 export const verifyEmail = async (userData) => {
-    const user = await User.findOne({_id: userData.userId});
+  console.log('userData in service:', userData);
+    const user = await User.findById(userData.userId);
+    console.log('user from DB:', user);
 
     if (!user) throw new AppError("User not found. Please signup first.", 404);
 
@@ -129,9 +165,26 @@ export const verifyEmail = async (userData) => {
 
     await verifyOTP(userData.OTP, user.OTP);
 
-    user.isEmailVerified = true;
+    user.isEmailVerified = true;  
+    user.OTP.code = null;
+    user.OTP.expiryTime = null;
+    // user.OTP = null;
+    console.log('user before save:', user);
 
     await user.save();
+
+    console.log('user after save:', user);
+
+    const token = generateToken(user);
+
+    console.log('generated token:', token);
+
+    const { password, OTP, lastResetPasswordOTPSentAt, isResetPasswordOTPVerified, isEmailVerified, ...userWithoutPasssword } = user.toObject();
+
+    console.log('user:', user);
+    console.log('token:', token);
+
+    return { user: userWithoutPasssword, token };
 }
 
 export const resendOTP = async (userData) => {
@@ -158,7 +211,7 @@ export const loginUser = async (userData) => {
 
     const token = generateToken(user);
 
-    const { password, OTP, lastResetPasswordOTPSentAt, isResetPasswordOTPVerified, ...userWithoutPasssword } = user.toObject();
+    const { password, OTP, lastResetPasswordOTPSentAt, isResetPasswordOTPVerified, isEmailVerified, ...userWithoutPasssword } = user.toObject();
 
     return { success: true, user: userWithoutPasssword, token: token };
 }
@@ -183,6 +236,8 @@ export const verifyResetPasswordOTP = async (userData) => {
   await verifyOTP(userData.OTP, user.OTP);
 
   user.isResetPasswordOTPVerified = true;
+  user.OTP.code = null;
+  user.OTP.expiryTime = null;
 
   await user.save();
 
@@ -215,7 +270,7 @@ export const editUser = async (userData) => {
     userData, 
     {new: true, runValidators: true}
   )
-  .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified")
+  .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified -isEmailVerified")
   .lean()
 
   if (!updatedUser) throw new AppError("Account not found", 404);

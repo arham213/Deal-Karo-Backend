@@ -36,17 +36,17 @@ const PlotModel = PropertyModel.discriminator('plot', new Schema({
   pricePerMarla: Number,
   installment: {
     perMonth: Number,
-    quarterly: Number
+    halfYearly: Number,
   }
 }));
 
 const HouseModel = PropertyModel.discriminator('house', new Schema({
   houseNo: { type: Number, unique: true, index: true },
   // rentPerMonth: Number,
-  installment: {
-    perMonth: Number,
-    quarterly: Number
-  }
+  // installment: {
+  //   perMonth: Number,
+  //   halfYearly: Number
+  // }
 }));
 
 const CommercialPlotModel = PropertyModel.discriminator('commercial plot', new Schema({
@@ -54,7 +54,7 @@ const CommercialPlotModel = PropertyModel.discriminator('commercial plot', new S
   pricePerMarla: Number,
   installment: {
     perMonth: Number,
-    quarterly: Number
+    halfYearly: Number
   }
 }));
 

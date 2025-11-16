@@ -38,11 +38,23 @@ const UserSchema = new mongoose.Schema({
             type: Date
         }
     },
+    lastOTPSentAt: {
+        type: Date,
+        default: null
+    },
     lastResetPasswordOTPSentAt: {
         type: Date,
         default: null
     },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
     isResetPasswordOTPVerified: {
+        type: Boolean,
+        default: false
+    },
+    onBoardingCompleted: {
         type: Boolean,
         default: false
     },
@@ -53,23 +65,49 @@ const UserSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
+// UserSchema.pre('save', async function (next) {
+//     try {
+//         // Hash password if modified
+//         if (this.isModified('password')) {
+//             this.password = await bcrypt.hash(this.password, 10);
+//         }
+
+//         // Hash OTP if modified
+//         if (this.isModified('OTP.code')) {
+//             this.OTP.code = await bcrypt.hash(this.OTP.code, 10);
+//         }
+
+//         next();
+//     } catch (error) {
+//         next(new Error("Failed to process user data. Please try again."))
+//     }
+// });
+
 UserSchema.pre('save', async function (next) {
-    try {
-        // Hash password if modified
-        if (this.isModified('password')) {
-            this.password = await bcrypt.hash(this.password, 10);
-        }
-
-        // Hash OTP if modified
-        if (this.isModified('OTP.code')) {
-            this.OTP.code = await bcrypt.hash(this.OTP.code, 10);
-        }
-
-        next();
-    } catch (error) {
-        next(new Error("Failed to process user data. Please try again."))
+  try {
+    // Hash password if modified
+    if (this.isModified('password')) {
+      this.password = await bcrypt.hash(this.password, 10);
     }
+
+    // Hash OTP only if it's a non-empty string
+    if (this.isModified('OTP.code')) {
+      const otpCode = this.OTP && this.OTP.code;
+      if (otpCode && typeof otpCode === 'string' && otpCode.length > 0) {
+        this.OTP.code = await bcrypt.hash(otpCode, 10);
+      } else {
+        // If OTP.code was cleared (null/undefined/empty), ensure it's null (or remove)
+        this.OTP.code = null;
+        this.OTP.expiryTime = null;
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(new Error("Failed to process user data. Please try again."));
+  }
 });
+
 
 const UserModel = mongoose.model('User', UserSchema);
 

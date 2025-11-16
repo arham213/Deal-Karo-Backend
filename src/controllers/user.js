@@ -54,9 +54,8 @@ export const GetStats = async (req, res, next) => {
 
 export const Signup = async (req, res, next) => {
   try {
-    await createUser(req.body);
-
-    return successResponse(res, 'Account created successfully. Please Login.', null , 201);
+    const userId = await createUser(req.body);
+    return successResponse(res, 'Account created successfully. Please Login.', { userId } , 201);
   } catch (error) {
     next(error);
   }
@@ -100,12 +99,18 @@ export const RejectAccount = async (req, res, next) => {
 
 
 export const VerifyEmail = async (req, res, next) => {
+  console.log('verify email controller called');
+  console.log('req.body:', req.body);
   try {
-    const userData = req.body;
+    const response = await verifyEmail(req.body);
+    console.log('response from service:', response);
 
-    await verifyEmail(userData);
+    const data = {
+      user: response.user,
+      token: response.token
+    }
 
-    return successResponse(res, 'Email verified successfully.', null , 200);
+    return successResponse(res, 'Email verified successfully.', data , 200);
   } catch (error) {
     next(error);
   }

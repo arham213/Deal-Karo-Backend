@@ -68,7 +68,7 @@ function generateProperty(propertyType, indexOffset) {
       pricePerMarla: faker.number.int({ min: 100000, max: 500000 }),
       installment: {
         perMonth: faker.number.int({ min: 20000, max: 150000 }),
-        quarterly: faker.number.int({ min: 60000, max: 300000 }),
+        halfYearly: faker.number.int({ min: 60000, max: 300000 }),
       },
     };
   }
@@ -80,7 +80,7 @@ function generateProperty(propertyType, indexOffset) {
       houseNo: number,
       installment: {
         perMonth: faker.number.int({ min: 30000, max: 200000 }),
-        quarterly: faker.number.int({ min: 90000, max: 600000 }),
+        halfYearly: faker.number.int({ min: 90000, max: 600000 }),
       },
     };
   }
@@ -93,7 +93,7 @@ function generateProperty(propertyType, indexOffset) {
       pricePerMarla: faker.number.int({ min: 150000, max: 800000 }),
       installment: {
         perMonth: faker.number.int({ min: 40000, max: 250000 }),
-        quarterly: faker.number.int({ min: 120000, max: 800000 }),
+        halfYearly: faker.number.int({ min: 120000, max: 800000 }),
       },
     };
   }
