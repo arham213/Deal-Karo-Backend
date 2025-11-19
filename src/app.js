@@ -13,7 +13,7 @@ app.use(express.json());
 app.use('/api', router);
 
 app.get('/', (req, res) => {
-  res.send('Welcome to Deal Karo Backend');
+  res.send('Welcome to Deal Kroo Backend');
 });
 
 // error handler middleware

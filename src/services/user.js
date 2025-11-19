@@ -23,7 +23,7 @@ export const getAllDealers = async (page = 1, limit = 10) => {
     .lean();
 
   // Get total count for pagination
-    const total = dealers?.length || 0;
+    const total = await User.countDocuments({ role: "dealer" });
 
     return {
         dealers,

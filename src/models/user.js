@@ -14,7 +14,6 @@ const UserSchema = new mongoose.Schema({
     contactNo: {
         type: String,
         required: true,
-        match: /^[0-9]{10,15}$/
     },
     estateName: {
         type: String,
@@ -64,24 +63,6 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
 }, { timestamps: true });
-
-// UserSchema.pre('save', async function (next) {
-//     try {
-//         // Hash password if modified
-//         if (this.isModified('password')) {
-//             this.password = await bcrypt.hash(this.password, 10);
-//         }
-
-//         // Hash OTP if modified
-//         if (this.isModified('OTP.code')) {
-//             this.OTP.code = await bcrypt.hash(this.OTP.code, 10);
-//         }
-
-//         next();
-//     } catch (error) {
-//         next(new Error("Failed to process user data. Please try again."))
-//     }
-// });
 
 UserSchema.pre('save', async function (next) {
   try {
