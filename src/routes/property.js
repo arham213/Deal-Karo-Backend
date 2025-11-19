@@ -34,7 +34,7 @@ PropertyRouter.get('/search/advanced', AdvancedSearchProperties);
 PropertyRouter.get('/search', SimpleSearchProperties);
 
 // Get a single Property by ID
-// PropertyRouter.get('/:propertyId', validateRequest({ params: propertyIdParamsSchema }), GetPropertyById);
+PropertyRouter.get('/:propertyId', validateRequest({ params: propertyIdParamsSchema }), GetPropertyById);
 
 // Create a new Property
 PropertyRouter.post('/', CreateProperty);
@@ -43,6 +43,6 @@ PropertyRouter.post('/', CreateProperty);
 // PropertyRouter.put('/', validateRequest({ body: updatePropertySchema }), UpdateProperty);
 
 // Delete an Property by ID
-// PropertyRouter.delete('/:propertyId', validateRequest({ params: propertyIdParamsSchema }), DeleteProperty);
+PropertyRouter.delete('/:propertyId', validateRequest({ params: propertyIdParamsSchema }), DeleteProperty);
 
 export default PropertyRouter;

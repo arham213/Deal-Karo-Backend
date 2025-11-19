@@ -1,4 +1,4 @@
-import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount } from "../services/user.js";
+import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount, deleteUser } from "../services/user.js";
 import { failureResponseWithData, successResponse } from "../utils/response.js";
 
 export const GetAllDealers = async (req, res, next) => {
@@ -80,6 +80,7 @@ export const VerifyAccount = async (req, res, next) => {
 }
 
 export const VerifyAllAccounts = async (req, res, next) => {
+  console.log('VerifyAllAccounts controller called');
   try {
     await verifyAllAccounts();
     return successResponse(res, 'All accounts verified successfully.', 201);
@@ -187,9 +188,9 @@ export const EditUser = async (req, res, next) => {
 
 export const DeleteUser = async (req, res, next) => {
   try {
-    const user = await editUser(userData);
+    const user = await deleteUser(req.params.userId);
 
-    return successResponse(res, 'User info updated successfully', {user: user}, 200);
+    return successResponse(res, 'User deleted successfully', {user: user}, 200);
   } catch (error) {
     next(error);
   }

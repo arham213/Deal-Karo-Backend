@@ -130,8 +130,12 @@ export const updateProperty = async (propertyData) => {
     return updatedProperty;
 }
 
-export const deleteProperty = async (propertyId) => {
-    const property = await Plot.findById(propertyId) || await House.findById(propertyId);
+export const deleteProperty = async (userId, propertyId) => {
+    // const property = await Plot.findOne({ userId: userId, propertyId: propertyId }) || await House.findOne({ userId: userId, propertyId: propertyId });
+    const property = await Property.findOne({
+        _id: propertyId,
+        userId
+    });
 
     if (!property) throw new AppError("Property not found", 404);
 

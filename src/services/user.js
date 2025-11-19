@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { User } from "../models/index.js";
+import { Property, User } from "../models/index.js";
 import { generateToken } from "../utils/jwt.js";
 import { generateOTP, verifyOTP } from "../utils/OTP.js";
 import { sendEmail } from "../utils/emailServer.js";
@@ -136,13 +136,17 @@ export const verifyAccount = async (userId) => {
 }
 
 export const verifyAllAccounts = async () => {
-  const users = await User.find({ isAccountVerified: false });
+  await User.updateMany(
+    {
+      verificationStatus: { $in: ["pending", "rejected"] },
+      role: "dealer",
+    },
+    { $set: { verificationStatus: "verified" } }
+  );
 
-  users?.forEach(async (user) => {
-    user.verificationStatus = "verified";
-    await user.save();
-  })
-}
+  return { success: true, message: "All dealer accounts verified." };
+};
+
 
 export const rejectAccount = async (userId) => {
   const user = await User.findById(userId);
@@ -277,6 +281,22 @@ export const editUser = async (userData) => {
 
   return updatedUser;
 };
+
+export const deleteUser = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError("User not found", 404)
+  }
+
+  const userProperties = await Property.find({userId});
+
+  userProperties?.forEach(async (userProperty) => {
+    await userProperty.deleteOne();
+  })
+
+  await user.deleteOne();
+}
 
 const generateOTPUpdateUserAndSendEmail = async (user, isSimpleOTP) => {
   const COOLDOWN_MS = 60 * 1000;

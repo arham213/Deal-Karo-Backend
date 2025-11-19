@@ -12,7 +12,7 @@ const PropertySchema = new Schema({
   additionalArea: { type: String },
   price: { type: Number, index: true },
   description: { type: String },
-  features: [{ type: String }],
+  // features: [{ type: String }],
   forContact: { type: String, required: true }
 }, { 
   discriminatorKey: 'propertyType',
@@ -32,7 +32,7 @@ PropertySchema.index({ description: 'text', phase: 'text', block: 'text', area: 
 const PropertyModel = mongoose.model('Property', PropertySchema);
 
 const PlotModel = PropertyModel.discriminator('plot', new Schema({
-  plotNo: { type: Number, unique: true, index: true },
+  plotNo: { type: Number, index: true },
   pricePerMarla: Number,
   installment: {
     perMonth: Number,
@@ -41,7 +41,7 @@ const PlotModel = PropertyModel.discriminator('plot', new Schema({
 }));
 
 const HouseModel = PropertyModel.discriminator('house', new Schema({
-  houseNo: { type: Number, unique: true, index: true },
+  houseNo: { type: Number, index: true },
   // rentPerMonth: Number,
   // installment: {
   //   perMonth: Number,

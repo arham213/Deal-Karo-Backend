@@ -26,6 +26,9 @@ UserRouter.post('/admin/signup', validateRequest({ body: adminSignupSchema }), A
 // Verify User Account
 UserRouter.put('/verifyAccount/:userId', authMiddleware, authorizeRoles("admin"), VerifyAccount);
 
+// // Verify User Account
+// UserRouter.put('/verifyAccount/:userId', authMiddleware, authorizeRoles("admin"), VerifyAccount);
+
 // Verify All User Accounts
 UserRouter.put('/verifyAllAccounts', authMiddleware, authorizeRoles("admin"), VerifyAllAccounts);
 
@@ -54,6 +57,6 @@ UserRouter.post('/resetPassword', validateRequest({ body: resetPasswordSchema })
 UserRouter.put('/', authMiddleware, validateRequest({ body: editUserSchema }), EditUser);
 
 // Remove User By Id
-// UserRouter.delete('/:userId', authMiddleware, validateRequest({ params: userIdParamsSchema }), DeleteUser);
+UserRouter.delete('/:userId', authMiddleware, authorizeRoles("admin"), validateRequest({ params: userIdParamsSchema }), DeleteUser);
 
 export default UserRouter;

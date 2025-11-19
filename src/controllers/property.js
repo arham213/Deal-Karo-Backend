@@ -78,7 +78,7 @@ export const UpdateProperty = async (req, res, next) => {
 
 export const DeleteProperty = async (req, res, next) => {
   try {
-    const property = await deleteProperty(req.params.propertyId);
+    const property = await deleteProperty(req.user.id, req.params.propertyId);
     return successResponse(res, "Property deleted successfully", { property }, 200);
   } catch (error) {
     next(error);

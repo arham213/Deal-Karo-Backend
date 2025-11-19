@@ -8,7 +8,7 @@ import { authorizeRoles } from "../middlewares/authorizeRoles.js";
 const router = express.Router();
 
 router.use('/users', UserRouter);
-router.use('/properties', authMiddleware, authorizeRoles("dealer"), PropertyRouter);
+router.use('/properties', authMiddleware, PropertyRouter);
 router.use('/notes', authMiddleware, authorizeRoles("dealer"), NoteRouter);
 
 export default router;
