@@ -64,7 +64,7 @@ export const getPropertiesByUserId = async (userId, page = 1, limit = 10) => {
 export const getPropertyById = async (propertyId) => {
     const property = await Property.findById(propertyId).populate('dealerId');
 
-    if (!property) throw new AppError("Property not found", 404);
+    if (!property) throw new AppError("Listing not found", 404);
 
     return property;
 }
@@ -101,13 +101,15 @@ export const createProperty = async (propertyData) => {
 
     query.propertyType = propertyData.propertyType;
     query.listingType = propertyData.listingType;
+    query.phase = propertyData.phase;
+    query.block = propertyData.block;
 
     const oldProperty = await Model.findOne(query);
 
     console.log('oldProperty:', oldProperty);
   
     if (oldProperty) {
-      throw new AppError("Property with this No already exists");
+      throw new AppError("Listing already already exists");
     }
   
     const newProperty = await Model.create(propertyData);
@@ -117,7 +119,7 @@ export const createProperty = async (propertyData) => {
 export const updateProperty = async (propertyData) => {
     const property = await Plot.findById(propertyData.propertyId) || await House.findById(propertyData.propertyId);
 
-    if (!property) throw new AppError("Property not found", 404);
+    if (!property) throw new AppError("Listing not found", 404);
 
     const Model = getModel(property.type);
     
@@ -137,7 +139,7 @@ export const deleteProperty = async (userId, propertyId) => {
         userId
     });
 
-    if (!property) throw new AppError("Property not found", 404);
+    if (!property) throw new AppError("Listing not found", 404);
 
     await property.deleteOne();
 
