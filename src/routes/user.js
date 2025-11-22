@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateRequest } from '../middlewares/validateRequest.js';
 import { loginSchema, signupSchema, editUserSchema, userIdParamsSchema, verifyEmailSchema, forgotPasswordSchema, resetPasswordSchema, verifyResetPasswordOTPSchema, resendOTPSchema, adminSignupSchema } from '../validators/user.js';
-import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount } from '../controllers/user.js';
+import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount } from '../controllers/user.js';
 import { resendOTPLimiter } from '../middlewares/rateLimiter.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.js";
@@ -56,7 +56,10 @@ UserRouter.post('/resetPassword', validateRequest({ body: resetPasswordSchema })
 // Edit User
 UserRouter.put('/', authMiddleware, validateRequest({ body: editUserSchema }), EditUser);
 
-// Remove User By Id
+// Delete Account
+UserRouter.delete('/delete-account', authMiddleware, DeleteAccount);
+
+// Delete User By Id
 UserRouter.delete('/:userId', authMiddleware, authorizeRoles("admin"), validateRequest({ params: userIdParamsSchema }), DeleteUser);
 
 export default UserRouter;

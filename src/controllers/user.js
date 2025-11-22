@@ -186,6 +186,17 @@ export const EditUser = async (req, res, next) => {
   }
 }
 
+export const DeleteAccount = async (req, res, next) => {
+  console.log('Delet Account API hit');
+  try {
+    const user = await deleteUser(req.user.id);
+
+    return successResponse(res, 'Account deleted successfully', {user: user}, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export const DeleteUser = async (req, res, next) => {
   try {
     const user = await deleteUser(req.params.userId);

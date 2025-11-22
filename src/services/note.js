@@ -8,6 +8,8 @@ export const getNotesByUserId = async (page = 1, limit = 10, userId) => {
 
     // Calculate pagination
     const skip = (pageNum - 1) * limitNum;
+    
+    // Execute query with pagination and sorting
     const notes = await Note.find({ userId: userId })
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -15,7 +17,7 @@ export const getNotesByUserId = async (page = 1, limit = 10, userId) => {
         .lean();
 
     // Get total count for pagination
-    const total = notes?.length || 0;
+    const total = await Note.countDocuments({ userId: userId });
 
     return {
         notes,
