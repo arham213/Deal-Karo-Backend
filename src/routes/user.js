@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateRequest } from '../middlewares/validateRequest.js';
 import { loginSchema, signupSchema, editUserSchema, userIdParamsSchema, verifyEmailSchema, forgotPasswordSchema, resetPasswordSchema, verifyResetPasswordOTPSchema, resendOTPSchema, adminSignupSchema } from '../validators/user.js';
-import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount } from '../controllers/user.js';
+import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount, RevokeAccount } from '../controllers/user.js';
 import { resendOTPLimiter } from '../middlewares/rateLimiter.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.js";
@@ -26,14 +26,14 @@ UserRouter.post('/admin/signup', validateRequest({ body: adminSignupSchema }), A
 // Verify User Account
 UserRouter.put('/verifyAccount/:userId', authMiddleware, authorizeRoles("admin"), VerifyAccount);
 
-// // Verify User Account
-// UserRouter.put('/verifyAccount/:userId', authMiddleware, authorizeRoles("admin"), VerifyAccount);
-
 // Verify All User Accounts
 UserRouter.put('/verifyAllAccounts', authMiddleware, authorizeRoles("admin"), VerifyAllAccounts);
 
 // Reject User Account
 UserRouter.put('/reject/:userId', authMiddleware, authorizeRoles("admin"), RejectAccount)
+
+// Revoke User Account
+UserRouter.put('/revoke/:userId', authMiddleware, authorizeRoles("admin"), RevokeAccount)
 
 // User Email Verification
 UserRouter.post('/verifyEmail', validateRequest({ body: verifyEmailSchema }), VerifyEmail);

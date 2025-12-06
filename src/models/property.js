@@ -12,8 +12,8 @@ const PropertySchema = new Schema({
   additionalArea: { type: String },
   price: { type: Number, index: true },
   description: { type: String },
-  // features: [{ type: String }],
-  forContact: { type: String, required: true }
+  forContact: { type: String, required: true },
+  possession: { type: Boolean }
 }, { 
   discriminatorKey: 'propertyType',
   collection: 'properties',
@@ -25,7 +25,6 @@ PropertySchema.index({ propertyType: 1, listingType: 1 });
 PropertySchema.index({ phase: 1, block: 1 });
 PropertySchema.index({ price: 1, propertyType: 1 });
 PropertySchema.index({ area: 1, propertyType: 1 });
-// PropertySchema.index({ features: 1 }); // Index for features array filtering
 // Text index for simple search
 PropertySchema.index({ description: 'text', phase: 'text', block: 'text', area: 'text' });
 

@@ -1,4 +1,4 @@
-import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount, deleteUser } from "../services/user.js";
+import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount, deleteUser, revokeAccount } from "../services/user.js";
 import { failureResponseWithData, successResponse } from "../utils/response.js";
 
 export const GetAllDealers = async (req, res, next) => {
@@ -92,7 +92,16 @@ export const VerifyAllAccounts = async (req, res, next) => {
 export const RejectAccount = async (req, res, next) => {
   try {
     await rejectAccount(req.params.userId);
-    return successResponse(res, 'Account rejected successfully', 201);
+    return successResponse(res, 'Account re successfully', 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const RevokeAccount = async (req, res, next) => {
+  try {
+    await revokeAccount(req.params.userId);
+    return successResponse(res, 'Account revoked successfully', 201);
   } catch (error) {
     next(error);
   }

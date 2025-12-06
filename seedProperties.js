@@ -4,7 +4,7 @@ import { PlotModel, HouseModel, CommercialPlotModel } from "./src/models/propert
 
 // --------------------- CONFIG ---------------------
 const MONGO_URI = "mongodb://localhost:27017/deal-karo"; // change if needed
-const TOTAL_RECORDS = 100000; // 0.1 million
+const TOTAL_RECORDS = 100; // 0.1 million
 const BATCH_SIZE = 5000;
 const START_NUMBER = 10000;
 

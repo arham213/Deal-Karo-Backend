@@ -158,6 +158,16 @@ export const rejectAccount = async (userId) => {
   await user.save();
 }
 
+export const revokeAccount = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) throw new AppError('User not fouund.', 404);
+
+  user.verificationStatus = "revoked";
+
+  await user.save();
+}
+
 export const verifyEmail = async (userData) => {
   console.log('userData in service:', userData);
     const user = await User.findById(userData.userId);

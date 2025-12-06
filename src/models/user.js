@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema({
     verificationStatus: {
         type: String,
         required: true,
-        enum: ["verified", "pending", "rejected"],
+        enum: ["verified", "pending", "rejected", "revoked"],
         default: "pending"
     },
     OTP: {
