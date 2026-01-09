@@ -69,27 +69,12 @@ export const getPropertyById = async (propertyId) => {
     return property;
 }
 
-// export const createProperty = async (propertyData) => {
-//     console.log('propertyData:', propertyData);
-//     const Model = getModel(propertyData.propertyType);
-
-//     console.log('Model:', Model);
-
-//     const oldProperty = await Model.find({ plotNo: propertyData.plotNo, propertyType: propertyData.propertyType }) || await Model.find({ houseNo: propertyData.houseNo, propertyType: propertyData.propertyType })
-    
-//     if (oldProperty) throw new AppError("Property with this No already exists")
-
-//     const newProperty = await Model.create(propertyData);
-
-//     return newProperty;
-// }
-
 export const createProperty = async (propertyData) => {
     console.log('propertyData:', propertyData);
-  
+
     const Model = getModel(propertyData.propertyType);
     console.log('Model:', Model);
-  
+
     // Find existing property by plotNo or houseNo
     const query = {}
 
@@ -107,14 +92,14 @@ export const createProperty = async (propertyData) => {
     const oldProperty = await Model.findOne(query);
 
     console.log('oldProperty:', oldProperty);
-  
+
     if (oldProperty) {
-      throw new AppError("Listing already already exists");
+        throw new AppError("Listing already already exists");
     }
-  
+
     const newProperty = await Model.create(propertyData);
     return newProperty;
-  };
+};
 
 export const updateProperty = async (propertyData) => {
     const property = await Plot.findById(propertyData.propertyId) || await House.findById(propertyData.propertyId);
@@ -122,7 +107,7 @@ export const updateProperty = async (propertyData) => {
     if (!property) throw new AppError("Listing not found", 404);
 
     const Model = getModel(property.type);
-    
+
     const updatedProperty = await Model.findByIdAndUpdate(
         propertyData.propertyId,
         propertyData,
@@ -312,7 +297,7 @@ export const simpleSearchProperties = async (filters) => {
         searchString,
         propertyType: queryPropertyType,
         listingType: queryListingType,
-        page = 1, 
+        page = 1,
         limit = 10
     } = filters;
 
@@ -325,7 +310,7 @@ export const simpleSearchProperties = async (filters) => {
 
     // Parse search string to extract criteria
     const extracted = parseSearchString(searchString);
-    
+
     // Use query params if provided, otherwise use extracted values
     const propertyType = queryPropertyType || extracted.propertyType;
     const listingType = queryListingType || extracted.listingType;
@@ -338,29 +323,29 @@ export const simpleSearchProperties = async (filters) => {
     if (userId) {
         baseQuery.userId = userId;
     }
-    
+
     if (propertyType) {
         baseQuery.propertyType = propertyType;
     }
-    
+
     if (listingType) {
         baseQuery.listingType = listingType;
     }
-    
+
     if (phase) {
         baseQuery.phase = phase;
     }
-    
+
     if (block) {
         baseQuery.block = block;
     }
-    
+
     // For area, use flexible regex matching to handle format variations and decimals
     if (extracted.areaNumber && extracted.areaUnit) {
         // Escape the number for regex (handle decimals)
         const escapedNumber = extracted.areaNumber.replace('.', '\\.');
         const unit = extracted.areaUnit.toLowerCase();
-        
+
         // Build a precise pattern that matches the exact number
         // Ensure the number is not part of a larger decimal (e.g., "5" shouldn't match in "7.5 marla")
         // For whole numbers: match "5 marla" but not "7.5 marla" or "15 marla"
@@ -375,16 +360,16 @@ export const simpleSearchProperties = async (filters) => {
             // This prevents "5" from matching in "7.5 marla" or "15 marla"
             areaPattern = `(^|[^\\d.])${escapedNumber}(?![.\\d])\\s*${unit}\\b`;
         }
-        
-        baseQuery.area = { 
-            $regex: new RegExp(areaPattern, 'i') 
+
+        baseQuery.area = {
+            $regex: new RegExp(areaPattern, 'i')
         };
     }
 
     // Build text/regex search conditions for remaining search terms
     // Remove extracted terms from search string to avoid redundant matching
     let remainingSearch = searchString.trim();
-    
+
     // Remove extracted terms from search string
     if (extracted.propertyType) {
         remainingSearch = remainingSearch.replace(new RegExp(extracted.propertyType.replace(' ', '\\s*'), 'gi'), '').trim();
@@ -413,13 +398,13 @@ export const simpleSearchProperties = async (filters) => {
     // If we have remaining search terms, also search in text fields
     // If we have both, combine with $and (must match extracted criteria AND text search)
     // If we only have extracted criteria, use them alone (most common case)
-    
+
     let query = {};
-    
+
     if (Object.keys(baseQuery).length > 0) {
         // We have extracted criteria - use them as primary filters
         query = baseQuery;
-        
+
         // If there's remaining search text, add it as an additional condition
         if (remainingSearch.length > 0) {
             query = {
@@ -481,17 +466,17 @@ const getModel = (type) => {
     let Model;
 
     switch (type) {
-      case "plot":
-        Model = Plot;
-        break;
-      case "house":
-        Model = House;
-        break;
-      case "commercial plot":
-        Model = CommercialPlot;
-        break;
-      default:
-        throw new AppError("Invalid property type", 400);
+        case "plot":
+            Model = Plot;
+            break;
+        case "house":
+            Model = House;
+            break;
+        case "commercial plot":
+            Model = CommercialPlot;
+            break;
+        default:
+            throw new AppError("Invalid property type", 400);
     }
 
     return Model;

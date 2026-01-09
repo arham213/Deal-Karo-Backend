@@ -13,8 +13,9 @@ const PropertySchema = new Schema({
   price: { type: Number, index: true },
   description: { type: String },
   forContact: { type: String, required: true },
-  possession: { type: Boolean }
-}, { 
+  possession: { type: Boolean },
+  imageUrl: { type: String }
+}, {
   discriminatorKey: 'propertyType',
   collection: 'properties',
   timestamps: true

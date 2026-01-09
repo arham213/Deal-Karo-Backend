@@ -1,23 +1,24 @@
 import express from 'express';
-import { 
-  createPropertySchema, 
-  propertyIdParamsSchema, 
+import {
+  createPropertySchema,
+  propertyIdParamsSchema,
   updatePropertySchema,
   advancedSearchSchema,
   simpleSearchSchema,
   getAllPropertiesSchema
 } from '../validators/property.js';
-import { 
-  GetAllProperties, 
-  GetPropertyById, 
-  CreateProperty, 
-  UpdateProperty, 
-  DeleteProperty, 
+import {
+  GetAllProperties,
+  GetPropertyById,
+  CreateProperty,
+  UpdateProperty,
+  DeleteProperty,
   GetMyProperties,
   AdvancedSearchProperties,
   SimpleSearchProperties
 } from '../controllers/property.js';
 import { validateRequest } from '../middlewares/validateRequest.js';
+import upload from '../middlewares/upload.js';
 
 const PropertyRouter = express.Router();
 
@@ -36,8 +37,8 @@ PropertyRouter.get('/search', SimpleSearchProperties);
 // Get a single Property by ID
 PropertyRouter.get('/:propertyId', validateRequest({ params: propertyIdParamsSchema }), GetPropertyById);
 
-// Create a new Property
-PropertyRouter.post('/', CreateProperty);
+// Create a new Property (with image upload support)
+PropertyRouter.post('/', upload.single('image'), CreateProperty);
 
 // Update an Property by ID
 // PropertyRouter.put('/', validateRequest({ body: updatePropertySchema }), UpdateProperty);

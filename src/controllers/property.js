@@ -9,6 +9,7 @@ import {
   simpleSearchProperties,
 } from "../services/property.js";
 import { successResponse } from "../utils/response.js";
+import { put } from "@vercel/blob";
 
 export const GetAllProperties = async (req, res, next) => {
   try {
@@ -60,7 +61,36 @@ export const CreateProperty = async (req, res, next) => {
   console.log('Create Property Request Recieved');
   try {
     console.log('userData:', req.body);
-    const property = await createProperty(req.body);
+
+    let imageUrl = null;
+
+    // Handle image upload to Vercel Blob if file is present
+    if (req.file) {
+      const filename = `properties/${Date.now()}-${req.file.originalname}`;
+      const blob = await put(filename, req.file.buffer, {
+        access: 'public',
+        contentType: req.file.mimetype,
+      });
+      imageUrl = blob.url;
+      console.log('Image uploaded to Vercel Blob:', imageUrl);
+    }
+
+    // Parse installment field if it's a JSON string (sent from form-data)
+    let propertyData = { ...req.body };
+    if (propertyData.installment && typeof propertyData.installment === 'string') {
+      try {
+        propertyData.installment = JSON.parse(propertyData.installment);
+      } catch (e) {
+        console.log('Failed to parse installment field:', e.message);
+      }
+    }
+
+    // Add image URL to property data
+    if (imageUrl) {
+      propertyData.imageUrl = imageUrl;
+    }
+
+    const property = await createProperty(propertyData);
     return successResponse(res, "Property created successfully", { property }, 201);
   } catch (error) {
     next(error);
