@@ -10,6 +10,7 @@ import {
 } from "../services/property.js";
 import { successResponse } from "../utils/response.js";
 import { put } from "@vercel/blob";
+import { sendNewListingNotifications } from "../services/notification.js";
 
 export const GetAllProperties = async (req, res, next) => {
   try {
@@ -91,6 +92,10 @@ export const CreateProperty = async (req, res, next) => {
     }
 
     const property = await createProperty(propertyData);
+
+    // Send push notifications to all other users (non-blocking)
+    sendNewListingNotifications(property, req.user.id);
+
     return successResponse(res, "Property created successfully", { property }, 201);
   } catch (error) {
     next(error);

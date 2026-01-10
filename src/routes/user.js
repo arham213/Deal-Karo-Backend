@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateRequest } from '../middlewares/validateRequest.js';
 import { loginSchema, signupSchema, editUserSchema, userIdParamsSchema, verifyEmailSchema, forgotPasswordSchema, resetPasswordSchema, verifyResetPasswordOTPSchema, resendOTPSchema, adminSignupSchema } from '../validators/user.js';
-import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount, RevokeAccount } from '../controllers/user.js';
+import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount, RevokeAccount, RegisterDeviceToken, UnregisterDeviceToken } from '../controllers/user.js';
 import { resendOTPLimiter } from '../middlewares/rateLimiter.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.js";
@@ -59,7 +59,18 @@ UserRouter.put('/', authMiddleware, validateRequest({ body: editUserSchema }), E
 // Delete Account
 UserRouter.delete('/delete-account', authMiddleware, DeleteAccount);
 
-// Delete User By Id
+// Register device token for push notifications
+UserRouter.post('/register-device-token', authMiddleware, RegisterDeviceToken);
+
+// Unregister device token - MUST come before /:userId route
+UserRouter.delete('/unregister-device-token', authMiddleware, (req, res, next) => {
+    console.log('🟡 [ROUTE] Unregister route handler reached');
+    console.log('🟡 [ROUTE] Request body:', req.body);
+    console.log('🟡 [ROUTE] Request headers:', req.headers);
+    next();
+}, UnregisterDeviceToken);
+
+// Delete User By Id - Generic route MUST come last
 UserRouter.delete('/:userId', authMiddleware, authorizeRoles("admin"), validateRequest({ params: userIdParamsSchema }), DeleteUser);
 
 export default UserRouter;
