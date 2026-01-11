@@ -48,11 +48,27 @@ export async function sendNewListingNotifications(listing, creatorId) {
                 validTokenCount++;
                 console.log(`✅ [NOTIFICATION] Valid token found for user ${user.name} on ${device.platform}`);
 
+                // Build notification body based on user verification status
+                const listingTypeCapitalized = listing.listingType.charAt(0).toUpperCase() + listing.listingType.slice(1);
+                const propertyTypeCapitalized = listing.propertyType.charAt(0).toUpperCase() + listing.propertyType.slice(1);
+                const areaInfo = listing.area;
+
+                let locationInfo = '';
+                let possessionInfo = '';
+                if (user.verificationStatus === 'verified') {
+                    // Verified users see phase and block
+                    locationInfo = `${listing.phase}, ${listing.block}`;
+                    // Add possession info for verified users
+                    possessionInfo = listing.possession ? ' with Possession' : 'without Possession';
+                }
+
+                const notificationBody = `${areaInfo} ${listingTypeCapitalized} ${propertyTypeCapitalized} ${possessionInfo} ${locationInfo ? ` in ${locationInfo}` : ''} - Rs. ${formatPrice(listing.price)}`;
+
                 messages.push({
                     to: device.token,
                     sound: 'default',
                     title: 'New Listing Added!',
-                    body: `${listing.listingType.charAt(0).toUpperCase() + listing.listingType.slice(1)} ${listing.propertyType.charAt(0).toUpperCase() + listing.propertyType.slice(1)} in ${listing.phase}, ${listing.block} - Rs. ${formatPrice(listing.price)}`,
+                    body: notificationBody,
                     data: {
                         type: 'new_listing',
                         propertyId: listing._id.toString() // For deep linking to property details
