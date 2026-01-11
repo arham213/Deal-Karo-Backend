@@ -49,20 +49,20 @@ export async function sendNewListingNotifications(listing, creatorId) {
                 console.log(`✅ [NOTIFICATION] Valid token found for user ${user.name} on ${device.platform}`);
 
                 // Build notification body based on user verification status
+                const areaInfo = listing.area;
                 const listingTypeCapitalized = listing.listingType.charAt(0).toUpperCase() + listing.listingType.slice(1);
                 const propertyTypeCapitalized = listing.propertyType.charAt(0).toUpperCase() + listing.propertyType.slice(1);
-                const areaInfo = listing.area;
 
                 let locationInfo = '';
                 let possessionInfo = '';
                 if (user.verificationStatus === 'verified') {
+                    // Add possession info for verified users
+                    possessionInfo = listing.possession ? 'with Possession' : 'without Possession';
                     // Verified users see phase and block
                     locationInfo = `${listing.phase}, ${listing.block}`;
-                    // Add possession info for verified users
-                    possessionInfo = listing.possession ? ' with Possession' : 'without Possession';
                 }
 
-                const notificationBody = `${areaInfo} ${listingTypeCapitalized} ${propertyTypeCapitalized} ${possessionInfo} ${locationInfo ? ` in ${locationInfo}` : ''} - Rs. ${formatPrice(listing.price)}`;
+                const notificationBody = `${areaInfo} ${listingTypeCapitalized} ${propertyTypeCapitalized} ${possessionInfo} ${locationInfo ? `in ${locationInfo}` : ''} - Rs. ${formatPrice(listing.price)}`;
 
                 messages.push({
                     to: device.token,
