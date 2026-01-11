@@ -57,12 +57,12 @@ export async function sendNewListingNotifications(listing, creatorId) {
                 let possessionInfo = '';
                 if (user.verificationStatus === 'verified') {
                     // Add possession info for verified users
-                    possessionInfo = listing.possession ? 'with Possession' : 'without Possession';
+                    possessionInfo = listing.possession ? ' with Possession ' : ' without Possession ';
                     // Verified users see phase and block
                     locationInfo = `${listing.phase}, ${listing.block}`;
                 }
 
-                const notificationBody = `${areaInfo} ${listingTypeCapitalized} ${propertyTypeCapitalized} ${possessionInfo} ${locationInfo ? `in ${locationInfo}` : ''} - Rs. ${formatPrice(listing.price)}`;
+                const notificationBody = `${areaInfo} ${listingTypeCapitalized} ${propertyTypeCapitalized}${possessionInfo}${locationInfo ? `in ${locationInfo} ` : ''}- Rs. ${formatPrice(listing.price)}`;
 
                 messages.push({
                     to: device.token,
