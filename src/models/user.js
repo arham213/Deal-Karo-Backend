@@ -66,7 +66,15 @@ const UserSchema = new mongoose.Schema({
         token: { type: String, required: true },
         platform: { type: String, enum: ['ios', 'android'], required: true },
         lastUpdated: { type: Date, default: Date.now }
-    }]
+    }],
+    online: {
+        type: Boolean,
+        default: false
+    },
+    lastSeen: {
+        type: Date,
+        default: Date.now
+    }
 }, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {

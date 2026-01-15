@@ -1,7 +1,7 @@
 import express from 'express';
 import { validateRequest } from '../middlewares/validateRequest.js';
 import { loginSchema, signupSchema, editUserSchema, userIdParamsSchema, verifyEmailSchema, forgotPasswordSchema, resetPasswordSchema, verifyResetPasswordOTPSchema, resendOTPSchema, adminSignupSchema } from '../validators/user.js';
-import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount, RevokeAccount, RegisterDeviceToken, UnregisterDeviceToken } from '../controllers/user.js';
+import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, GetAllUsers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount, RevokeAccount, RegisterDeviceToken, UnregisterDeviceToken } from '../controllers/user.js';
 import { resendOTPLimiter } from '../middlewares/rateLimiter.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.js";
@@ -10,6 +10,9 @@ const UserRouter = express.Router();
 
 //Get All Users
 UserRouter.get('/dealers', authMiddleware, authorizeRoles("admin"), GetAllDealers);
+
+// Get all users for chat (excluding current user)
+UserRouter.get('/', authMiddleware, GetAllUsers);
 
 // Get YourSelf
 UserRouter.get('/me', authMiddleware, GetYourSelf);

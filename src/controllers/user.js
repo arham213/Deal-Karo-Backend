@@ -1,4 +1,4 @@
-import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount, deleteUser, revokeAccount } from "../services/user.js";
+import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, getAllUsers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount, deleteUser, revokeAccount } from "../services/user.js";
 import { failureResponseWithData, successResponse } from "../utils/response.js";
 
 export const GetAllDealers = async (req, res, next) => {
@@ -37,6 +37,16 @@ export const GetYourSelf = async (req, res, next) => {
     const user = await getUserById(req.user.id);
 
     return successResponse(res, "User fetched successfully", { user: user }, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const GetAllUsers = async (req, res, next) => {
+  try {
+    const users = await getAllUsers(req.user.id);
+
+    return successResponse(res, "Users fetched successfully", { users }, 200);
   } catch (error) {
     next(error);
   }

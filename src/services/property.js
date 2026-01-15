@@ -1,5 +1,6 @@
 import { Property, Plot, House, CommercialPlot } from "../models/index.js";
 import { AppError } from "../utils/AppError.js";
+import { del } from "@vercel/blob";
 
 export const getAllProperties = async (page = 1, limit = 10) => {
     // Ensure page and limit are integers
@@ -117,14 +118,32 @@ export const updateProperty = async (propertyData) => {
     return updatedProperty;
 }
 
-export const deleteProperty = async (userId, propertyId) => {
+export const deleteProperty = async (userId, role, propertyId) => {
     // const property = await Plot.findOne({ userId: userId, propertyId: propertyId }) || await House.findOne({ userId: userId, propertyId: propertyId });
-    const property = await Property.findOne({
-        _id: propertyId,
-        userId
-    });
+    let property;
+    if (role === 'admin') {
+        property = await Property.findOne({
+            _id: propertyId
+        });
+    } else {
+        property = await Property.findOne({
+            _id: propertyId,
+            userId
+        });
+    }
 
     if (!property) throw new AppError("Listing not found", 404);
+
+    // Delete image from Vercel Blob storage if the property has an image
+    if (property.imageUrl) {
+        try {
+            await del(property.imageUrl);
+            console.log('Image deleted from Vercel Blob:', property.imageUrl);
+        } catch (error) {
+            console.error('Failed to delete image from Vercel Blob:', error.message);
+            // Continue with property deletion even if blob deletion fails
+        }
+    }
 
     await property.deleteOne();
 

@@ -23,17 +23,17 @@ export const getAllDealers = async (page = 1, limit = 10) => {
     .lean();
 
   // Get total count for pagination
-    const total = await User.countDocuments({ role: "dealer" });
+  const total = await User.countDocuments({ role: "dealer" });
 
-    return {
-        dealers,
-        pagination: {
-            total,
-            page: pageNum,
-            limit: limitNum,
-            totalPages: Math.ceil(total / limitNum)
-        }
-    };
+  return {
+    dealers,
+    pagination: {
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / limitNum)
+    }
+  };
 }
 
 export const getUserById = async (userId) => {
@@ -44,6 +44,14 @@ export const getUserById = async (userId) => {
   if (!user) throw new AppError("User not found", 404);
 
   return user;
+}
+
+export const getAllUsers = async (currentUserId) => {
+  const users = await User.find({
+    _id: { $ne: currentUserId } // Exclude current user
+  }).select('name email online lastSeen');
+
+  return users;
 }
 
 export const getStats = async () => {
@@ -73,7 +81,7 @@ export const createUser = async (userData) => {
     expiryTime: new Date(Date.now() + OTP_EXPIRY_MIN * 60 * 1000)
   };
 
-  const user = await User.create({...userData, OTP});
+  const user = await User.create({ ...userData, OTP });
 
   await sendEmail(userData.email, 'Email Verification', `Please verify your email\nYour OTP is: ${code}`);
 
@@ -170,35 +178,35 @@ export const revokeAccount = async (userId) => {
 
 export const verifyEmail = async (userData) => {
   console.log('userData in service:', userData);
-    const user = await User.findById(userData.userId);
-    console.log('user from DB:', user);
+  const user = await User.findById(userData.userId);
+  console.log('user from DB:', user);
 
-    if (!user) throw new AppError("User not found. Please signup first.", 404);
+  if (!user) throw new AppError("User not found. Please signup first.", 404);
 
-    if (user.isEmailVerified) throw new AppError("Email already verified. Please login.", 400);
+  if (user.isEmailVerified) throw new AppError("Email already verified. Please login.", 400);
 
-    await verifyOTP(userData.OTP, user.OTP);
+  await verifyOTP(userData.OTP, user.OTP);
 
-    user.isEmailVerified = true;  
-    user.OTP.code = null;
-    user.OTP.expiryTime = null;
-    // user.OTP = null;
-    console.log('user before save:', user);
+  user.isEmailVerified = true;
+  user.OTP.code = null;
+  user.OTP.expiryTime = null;
+  // user.OTP = null;
+  console.log('user before save:', user);
 
-    await user.save();
+  await user.save();
 
-    console.log('user after save:', user);
+  console.log('user after save:', user);
 
-    const token = generateToken(user);
+  const token = generateToken(user);
 
-    console.log('generated token:', token);
+  console.log('generated token:', token);
 
-    const { password, OTP, lastResetPasswordOTPSentAt, isResetPasswordOTPVerified, isEmailVerified, ...userWithoutPasssword } = user.toObject();
+  const { password, OTP, lastResetPasswordOTPSentAt, isResetPasswordOTPVerified, isEmailVerified, ...userWithoutPasssword } = user.toObject();
 
-    console.log('user:', user);
-    console.log('token:', token);
+  console.log('user:', user);
+  console.log('token:', token);
 
-    return { user: userWithoutPasssword, token };
+  return { user: userWithoutPasssword, token };
 }
 
 export const resendOTP = async (userData) => {
@@ -215,19 +223,19 @@ export const resendOTP = async (userData) => {
 }
 
 export const loginUser = async (userData) => {
-    const user = await User.findOne({ email: userData.email });
+  const user = await User.findOne({ email: userData.email });
 
-    if (!user) throw new AppError("Invalid email or password.", 401);
+  if (!user) throw new AppError("Invalid email or password.", 401);
 
-    const isPasswordCorrect = await bcrypt.compare(userData.password, user.password);
+  const isPasswordCorrect = await bcrypt.compare(userData.password, user.password);
 
-    if (!isPasswordCorrect) throw new AppError("Invalid email or password.", 401);
+  if (!isPasswordCorrect) throw new AppError("Invalid email or password.", 401);
 
-    const token = generateToken(user);
+  const token = generateToken(user);
 
-    const { password, OTP, lastResetPasswordOTPSentAt, isResetPasswordOTPVerified, isEmailVerified, ...userWithoutPasssword } = user.toObject();
+  const { password, OTP, lastResetPasswordOTPSentAt, isResetPasswordOTPVerified, isEmailVerified, ...userWithoutPasssword } = user.toObject();
 
-    return { success: true, user: userWithoutPasssword, token: token };
+  return { success: true, user: userWithoutPasssword, token: token };
 }
 
 export const sendResetPasswordOTP = async (email) => {
@@ -264,7 +272,7 @@ export const resetPassword = async (userData) => {
   if (!user) throw new AppError("Account does not exist. Please signup first.", 404);
 
   if (!user.isResetPasswordOTPVerified) throw new AppError("Invalid reset password request. Kindly verify the reset password OTP first.")
-  
+
   user.password = userData.password;
 
   user.isResetPasswordOTPVerified = false;
@@ -273,7 +281,7 @@ export const resetPassword = async (userData) => {
 }
 
 export const editUser = async (userData) => {
-  const user = await User.findOne({ email: userData.email});
+  const user = await User.findOne({ email: userData.email });
 
   if (user) throw new AppError("User with this email already exists", 404);
 
@@ -281,11 +289,11 @@ export const editUser = async (userData) => {
 
   const updatedUser = await User.findByIdAndUpdate(
     userData._id,
-    userData, 
-    {new: true, runValidators: true}
+    userData,
+    { new: true, runValidators: true }
   )
-  .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified -isEmailVerified")
-  .lean()
+    .select("-password -OTP -lastResetPasswordOTPSentAt -isResetPasswordOTPVerified -isEmailVerified")
+    .lean()
 
   if (!updatedUser) throw new AppError("Account not found", 404);
 
@@ -299,7 +307,7 @@ export const deleteUser = async (userId) => {
     throw new AppError("User not found", 404)
   }
 
-  const userProperties = await Property.find({userId});
+  const userProperties = await Property.find({ userId });
 
   userProperties?.forEach(async (userProperty) => {
     await userProperty.deleteOne();
@@ -314,12 +322,12 @@ const generateOTPUpdateUserAndSendEmail = async (user, isSimpleOTP) => {
   let code = null;
 
   if (isSimpleOTP) {
-    if (user?.lastOTPSentAt && (now - user?.lastOTPSentAt.getTime()) < COOLDOWN_MS ) {
+    if (user?.lastOTPSentAt && (now - user?.lastOTPSentAt.getTime()) < COOLDOWN_MS) {
       const secondsLeft = Math.ceil((COOLDOWN_MS - (now - user.lastOTPSentAt.getTime())) / 1000);
       throw new AppError(`Please wait for ${secondsLeft} second(s) before making a new request`, 429);
     }
   } else {
-    if (user?.lastResetPasswordOTPSentAt && (now - user?.lastResetPasswordOTPSentAt.getTime()) < COOLDOWN_MS ) {
+    if (user?.lastResetPasswordOTPSentAt && (now - user?.lastResetPasswordOTPSentAt.getTime()) < COOLDOWN_MS) {
       const secondsLeft = Math.ceil((COOLDOWN_MS - (now - user.lastResetPasswordOTPSentAt.getTime())) / 1000);
       throw new AppError(`Please wait for ${secondsLeft} second(s) before making a new request`, 429);
     }
