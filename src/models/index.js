@@ -6,3 +6,4 @@ export { CommercialPlotModel as CommercialPlot } from './property.js';
 export { default as Note } from './note.js';
 export { default as Chat } from './chat.js';
 export { default as Message } from './message.js';
+export { default as AppConfig } from './appConfig.js';
