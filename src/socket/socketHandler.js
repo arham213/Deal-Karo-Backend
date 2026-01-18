@@ -251,6 +251,93 @@ const setupSocket = (io) => {
             }
         })
 
+        // Handle sending a voice message
+        socket.on('send_voice', async (data) => {
+            try {
+                const { chatId, voiceUrl, duration } = data;
+
+                // Verify user is participant in this chat
+                const chat = await Chat.findOne({
+                    _id: chatId,
+                    participants: socket.userId
+                });
+
+                if (!chat) {
+                    socket.emit('error', { message: 'Chat not found or unauthorized' });
+                    return;
+                }
+
+                // Create message
+                const message = new Message({
+                    chat: chatId,
+                    sender: socket.userId,
+                    content: voiceUrl,
+                    type: 'voice',
+                    duration: duration || 0
+                });
+
+                await message.save();
+                await message.populate('sender', 'name');
+
+                // Update chat's last message and timestamp
+                chat.lastMessage = message._id;
+                chat.updatedAt = new Date();
+                await chat.save();
+
+                // Emit message to all users in the chat room except sender
+                const participants = chat.participants.map(participantId => participantId.toString());
+
+                participants.forEach(async (participantId) => {
+                    if (participantId === socket.userId) return; // Skip sender
+                    const participantSocketId = connectedUsers.get(participantId);
+
+                    if (participantSocketId) {
+                        // Mark as read if chat opened for online users
+                        const participantOpenedChatId = usersOpenedChats.get(participantId);
+                        if (participantOpenedChatId === chatId) {
+                            message.read = true;
+                            await message.save();
+
+                            const senderSocketId = connectedUsers.get(socket.userId);
+                            io.to(senderSocketId).emit('message_read', {
+                                message: {
+                                    _id: message._id,
+                                    chat: message.chat,
+                                    read: message.read,
+                                    readBy: participantId
+                                }
+                            });
+                        }
+
+                        io.to(participantSocketId).emit('new_message', {
+                            message: {
+                                _id: message._id,
+                                chat: message.chat,
+                                sender: message.sender,
+                                content: message.content,
+                                type: message.type,
+                                duration: message.duration,
+                                read: message.read,
+                                createdAt: message.createdAt
+                            }
+                        });
+                    }
+                });
+
+                // Notify participants about chat update
+                chat.participants.forEach(participantId => {
+                    io.to(participantId.toString()).emit('chat_updated', {
+                        chatId: chatId,
+                        lastMessage: message
+                    });
+                });
+
+            } catch (error) {
+                console.error('Send voice error:', error);
+                socket.emit('error', { message: 'Failed to send voice message' });
+            }
+        });
+
         // Handle typing indicator
         socket.on('typing', (data) => {
             const { chatId, isTyping } = data;

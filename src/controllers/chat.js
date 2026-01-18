@@ -1,4 +1,4 @@
-import { getAllChats, createOrGetChat, getChatMessages, uploadChatImage } from "../services/chat.js";
+import { getAllChats, createOrGetChat, getChatMessages, uploadChatImage, uploadChatVoice } from "../services/chat.js";
 import { successResponse } from "../utils/response.js";
 
 export const GetAllChats = async (req, res, next) => {
@@ -13,6 +13,7 @@ export const GetAllChats = async (req, res, next) => {
 
 export const CreateOrGetChat = async (req, res, next) => {
     try {
+        console.log('🟡 [CHAT] CreateOrGetChat controller reached');
         const { participantId } = req.body;
         const result = await createOrGetChat(req.user.id, participantId);
 
@@ -38,9 +39,21 @@ export const GetChatMessages = async (req, res, next) => {
 
 export const UploadChatImage = async (req, res, next) => {
     try {
+        console.log('🟡 [CHAT] UploadChatImage controller reached');
         const imageUrl = await uploadChatImage(req.file);
 
         return successResponse(res, "Image uploaded successfully", { imageUrl }, 200);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const UploadChatVoice = async (req, res, next) => {
+    try {
+        console.log('🟡 [CHAT] UploadChatVoice controller reached', req.file);
+        const audioUrl = await uploadChatVoice(req.file);
+
+        return successResponse(res, "Voice uploaded successfully", { audioUrl }, 200);
     } catch (error) {
         next(error);
     }

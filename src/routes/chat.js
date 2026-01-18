@@ -1,5 +1,5 @@
 import express from 'express';
-import { GetAllChats, CreateOrGetChat, GetChatMessages, UploadChatImage } from '../controllers/chat.js';
+import { GetAllChats, CreateOrGetChat, GetChatMessages, UploadChatImage, UploadChatVoice } from '../controllers/chat.js';
 import { authMiddleware } from '../middlewares/auth.js';
 import upload from '../middlewares/upload.js';
 
@@ -17,5 +17,9 @@ ChatRouter.get('/:chatId/messages', authMiddleware, GetChatMessages);
 // Upload chat image
 ChatRouter.post('/uploadImage', authMiddleware, upload.single('image'), UploadChatImage);
 
+// Upload voice message
+ChatRouter.post('/upload-voice', authMiddleware, upload.single('audio'), UploadChatVoice);
+
 export default ChatRouter;
+
 

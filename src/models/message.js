@@ -18,8 +18,11 @@ const messageSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['text', 'image'],
+        enum: ['text', 'image', 'voice'],
         default: 'text'
+    },
+    duration: {
+        type: Number
     },
     read: {
         type: Boolean,

@@ -37,6 +37,8 @@ export const createOrGetChat = async (userId, participantId) => {
         };
     }
 
+    console.log('🟡 [CHAT] Chat does not exist, creating new chat');
+
     // Create new chat
     const chat = new Chat({
         participants: [userId, participantId]
@@ -81,6 +83,21 @@ export const uploadChatImage = async (file) => {
         access: 'public',
         contentType: file.mimetype
     });
+
+    return blob.url;
+};
+
+export const uploadChatVoice = async (file) => {
+    if (!file) {
+        throw new AppError('No audio file provided', 400);
+    }
+
+    const blob = await put(`voice-messages/${Date.now()}.m4a`, file.buffer, {
+        access: 'public',
+        contentType: 'audio/m4a'
+    });
+
+    console.log('🟢 [CHAT] Voice message uploaded successfully', blob.url);
 
     return blob.url;
 };
