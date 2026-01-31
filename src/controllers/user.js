@@ -1,4 +1,4 @@
-import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, getAllUsers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount, deleteUser, revokeAccount } from "../services/user.js";
+import { createUser, verifyEmail, loginUser, editUser, resendOTP, resetPassword, sendResetPasswordOTP, getUserById, getAllDealers, getAllUsers, verifyResetPasswordOTP, createAdmin, verifyAccount, verifyAllAccounts, getStats, rejectAccount, deleteUser, revokeAccount, uploadProfileImage, deleteProfileImage } from "../services/user.js";
 import { failureResponseWithData, successResponse } from "../utils/response.js";
 
 export const GetAllDealers = async (req, res, next) => {
@@ -321,5 +321,25 @@ export const UnregisterDeviceToken = async (req, res, next) => {
     // Even on error, return success to prevent logout issues
     // The token removal is not critical for logout to succeed
     return successResponse(res, "Device token unregistered successfully", {}, 200);
+  }
+};
+
+export const UploadProfileImage = async (req, res, next) => {
+  try {
+    const profileImageUrl = await uploadProfileImage(req.user.id, req.file);
+
+    return successResponse(res, "Profile image uploaded successfully", { profileImage: profileImageUrl }, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const DeleteProfileImage = async (req, res, next) => {
+  try {
+    await deleteProfileImage(req.user.id);
+
+    return successResponse(res, "Profile image removed successfully", {}, 200);
+  } catch (error) {
+    next(error);
   }
 };

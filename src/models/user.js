@@ -74,6 +74,10 @@ const UserSchema = new mongoose.Schema({
     lastSeen: {
         type: Date,
         default: Date.now
+    },
+    profileImage: {
+        type: String,
+        default: null
     }
 }, { timestamps: true });
 

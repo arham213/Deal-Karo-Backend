@@ -53,6 +53,14 @@ export async function sendNewListingNotifications(listing, creatorId) {
                 const listingTypeCapitalized = listing.listingType.charAt(0).toUpperCase() + listing.listingType.slice(1);
                 const propertyTypeCapitalized = listing.propertyType.charAt(0).toUpperCase() + listing.propertyType.slice(1);
 
+                // Build property number info based on property type
+                let propertyNumberInfo = '';
+                if (listing.propertyType === 'house' && listing.houseNo) {
+                    propertyNumberInfo = ` House# ${listing.houseNo} `;
+                } else if ((listing.propertyType === 'plot' || listing.propertyType === 'commercial plot') && listing.plotNo) {
+                    propertyNumberInfo = ` Plot# ${listing.plotNo} `;
+                }
+
                 let locationInfo = '';
                 let possessionInfo = '';
                 if (user.verificationStatus === 'verified') {
@@ -62,7 +70,7 @@ export async function sendNewListingNotifications(listing, creatorId) {
                     locationInfo = `${listing.phase}, ${listing.block}`;
                 }
 
-                const notificationBody = `${areaInfo} ${listingTypeCapitalized} ${propertyTypeCapitalized}${possessionInfo}${locationInfo ? `in ${locationInfo} ` : ''}- Rs. ${formatPrice(listing.price)}`;
+                const notificationBody = `${areaInfo} ${listingTypeCapitalized} ${propertyTypeCapitalized}${possessionInfo},${propertyNumberInfo}${locationInfo ? `in ${locationInfo} ` : ''}- Rs. ${formatPrice(listing.price)}`;
 
                 messages.push({
                     to: device.token,

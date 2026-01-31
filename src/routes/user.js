@@ -1,10 +1,11 @@
 import express from 'express';
 import { validateRequest } from '../middlewares/validateRequest.js';
 import { loginSchema, signupSchema, editUserSchema, userIdParamsSchema, verifyEmailSchema, forgotPasswordSchema, resetPasswordSchema, verifyResetPasswordOTPSchema, resendOTPSchema, adminSignupSchema } from '../validators/user.js';
-import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, GetAllUsers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount, RevokeAccount, RegisterDeviceToken, UnregisterDeviceToken } from '../controllers/user.js';
+import { GetYourSelf, Signup, VerifyEmail, Login, EditUser, DeleteUser, ResendOTP, ForgotPassword, ResetPassword, GetAllDealers, GetAllUsers, VerifyResetPasswordOTP, AdminSignup, VerifyAccount, VerifyAllAccounts, GetStats, RejectAccount, DeleteAccount, RevokeAccount, RegisterDeviceToken, UnregisterDeviceToken, UploadProfileImage, DeleteProfileImage } from '../controllers/user.js';
 import { resendOTPLimiter } from '../middlewares/rateLimiter.js';
 import { authMiddleware } from "../middlewares/auth.js";
 import { authorizeRoles } from "../middlewares/authorizeRoles.js";
+import upload from '../middlewares/upload.js';
 
 const UserRouter = express.Router();
 
@@ -64,6 +65,12 @@ UserRouter.delete('/delete-account', authMiddleware, DeleteAccount);
 
 // Register device token for push notifications
 UserRouter.post('/register-device-token', authMiddleware, RegisterDeviceToken);
+
+// Profile image upload
+UserRouter.post('/profile-image', authMiddleware, upload.single('image'), UploadProfileImage);
+
+// Profile image delete
+UserRouter.delete('/profile-image', authMiddleware, DeleteProfileImage);
 
 // Unregister device token - MUST come before /:userId route
 UserRouter.delete('/unregister-device-token', authMiddleware, (req, res, next) => {

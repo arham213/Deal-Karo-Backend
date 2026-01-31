@@ -4,6 +4,7 @@ import { generateToken } from "../utils/jwt.js";
 import { generateOTP, verifyOTP } from "../utils/OTP.js";
 import { sendEmail } from "../utils/emailServer.js";
 import { AppError } from "../utils/AppError.js";
+import { put, del } from "@vercel/blob";
 
 const OTP_EXPIRY_MIN = 10;
 
@@ -356,3 +357,74 @@ const generateOTPUpdateUserAndSendEmail = async (user, isSimpleOTP) => {
 
   await user.save();
 }
+
+/**
+ * Upload user profile image to Vercel Blob
+ * @param {String} userId - The user's ID
+ * @param {Object} file - The uploaded file object from multer
+ * @returns {String} - The URL of the uploaded image
+ */
+export const uploadProfileImage = async (userId, file) => {
+  if (!file) {
+    throw new AppError('No image file provided', 400);
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  // Delete old profile image if exists
+  if (user.profileImage) {
+    try {
+      await del(user.profileImage);
+      console.log('Old profile image deleted:', user.profileImage);
+    } catch (error) {
+      console.error('Failed to delete old profile image:', error.message);
+      // Continue with upload even if deletion fails
+    }
+  }
+
+  // Upload new image to Vercel Blob
+  const blob = await put(`profile-images/${userId}-${Date.now()}-${file.originalname}`, file.buffer, {
+    access: 'public',
+    contentType: file.mimetype
+  });
+
+  // Update user with new profile image URL
+  user.profileImage = blob.url;
+  await user.save();
+
+  console.log('Profile image uploaded:', blob.url);
+
+  return blob.url;
+};
+
+/**
+ * Delete user profile image from Vercel Blob
+ * @param {String} userId - The user's ID
+ */
+export const deleteProfileImage = async (userId) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  if (!user.profileImage) {
+    throw new AppError('No profile image to delete', 400);
+  }
+
+  // Delete image from Vercel Blob
+  try {
+    await del(user.profileImage);
+    console.log('Profile image deleted:', user.profileImage);
+  } catch (error) {
+    console.error('Failed to delete profile image from blob:', error.message);
+    // Continue with clearing the field even if blob deletion fails
+  }
+
+  // Clear profile image field
+  user.profileImage = null;
+  await user.save();
+};
