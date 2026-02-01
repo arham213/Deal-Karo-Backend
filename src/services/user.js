@@ -50,7 +50,7 @@ export const getUserById = async (userId) => {
 export const getAllUsers = async (currentUserId) => {
   const users = await User.find({
     _id: { $ne: currentUserId } // Exclude current user
-  }).select('name email online lastSeen');
+  }).select('name email online lastSeen profileImage');
 
   return users;
 }

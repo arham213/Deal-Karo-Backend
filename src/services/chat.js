@@ -6,7 +6,7 @@ export const getAllChats = async (userId) => {
     const chats = await Chat.find({
         participants: userId
     })
-        .populate('participants', 'name email online lastSeen')
+        .populate('participants', 'name email online lastSeen profileImage')
         .populate('lastMessage')
         .sort({ updatedAt: -1 });
 
