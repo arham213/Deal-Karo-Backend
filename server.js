@@ -25,8 +25,8 @@ setupSocket(io);
 const startServer = async () => {
     await connectDB();
     startCronJobs();
-    const PORT = process.env.PORT || 8000;
-    server.listen(PORT, () => {
+    const PORT = process.env.PORT || 8080;
+    server.listen(PORT, '0.0.0.0', () => {
         console.log(`Server Running on Port: ${PORT}`);
         console.log(`Socket.IO is ready for connections`);
     });
