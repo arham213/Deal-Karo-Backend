@@ -244,6 +244,8 @@ export const sendResetPasswordOTP = async (email) => {
 
   if (!user) throw new AppError("Account does not exists. Please signup first.", 404);
 
+  console.log('user:', user);
+
   await generateOTPUpdateUserAndSendEmail(user, false);
 
   console.log('Forgot password OTP sent');
@@ -336,6 +338,8 @@ const generateOTPUpdateUserAndSendEmail = async (user, isSimpleOTP) => {
     }
   }
 
+  console.log('generating code');
+
   code = generateOTP();
 
   const OTP = {
@@ -345,8 +349,12 @@ const generateOTPUpdateUserAndSendEmail = async (user, isSimpleOTP) => {
 
   user.OTP = OTP;
 
+  console.log('OTP is:', OTP);
+
   try {
+    console.log('sending email');
     await sendEmail(user.email, 'Email Verification', `Please verify your email\nYour OTP is: ${code}`);
+    console.log('email sent');
   } catch (error) {
     throw new AppError("Something went wrong. Please try again later.", 500);
   }
@@ -357,7 +365,9 @@ const generateOTPUpdateUserAndSendEmail = async (user, isSimpleOTP) => {
     user.lastResetPasswordOTPSentAt = new Date();
   }
 
+  console.log('saving user');
   await user.save();
+  console.log('saved user');
 }
 
 /**
