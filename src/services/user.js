@@ -246,6 +246,8 @@ export const sendResetPasswordOTP = async (email) => {
 
   await generateOTPUpdateUserAndSendEmail(user, false);
 
+  console.log('Forgot password OTP sent');
+
   return user._id;
 }
 
