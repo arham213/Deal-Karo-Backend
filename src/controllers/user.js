@@ -167,6 +167,7 @@ export const Login = async (req, res, next) => {
 
 export const ForgotPassword = async (req, res, next) => {
   try {
+    console.log('forgot password API called');
     const userId = await sendResetPasswordOTP(req.body.email);
 
     return successResponse(res, "Password reset OTP has been sent to your email.", { userId }, 200);
