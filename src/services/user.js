@@ -353,10 +353,12 @@ const generateOTPUpdateUserAndSendEmail = async (user, isSimpleOTP) => {
 
   try {
     console.log('sending email');
-    // await sendEmail(user.email, 'Email Verification', `Please verify your email\nYour OTP is: ${code}`);
+    await sendEmail(user.email, 'Email Verification', `Please verify your email\nYour OTP is: ${code}`);
     console.log('email sent');
   } catch (error) {
-    throw new AppError("Something went wrong. Please try again later.", 500);
+    // throw new AppError("Something went wrong. Please try again later.", 500);
+    console.error("EMAIL ERROR:", error);
+    throw error;
   }
 
   if (isSimpleOTP) {
