@@ -28,13 +28,20 @@ const getTransporter = () => {
 
 
 export const sendEmail = async (to, subject, message) => {
+    console.log('sendEmail function called');
+    
+    console.log('getting transporter');
     const transporter = getTransporter();
+    console.log('sending email via transporter:'.transporter);
+
     const info = await transporter.sendMail({
         from: 'Deal Krein <arhamasjid213@gmail.com>',
         to: to,
         subject: subject,
         text: message
     })
+
+    console.log('email sent with info:', info);
 
     return info;
 }
