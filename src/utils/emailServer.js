@@ -1,9 +1,7 @@
 import { Resend } from 'resend';
-import Brevo from '@getbrevo/brevo';
+import * as Brevo from '@getbrevo/brevo';
 
 // ── Resend ──────────────────────────────────────────────────────────────────
-
-
 
 const sendViaResend = async (to, subject, message) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
