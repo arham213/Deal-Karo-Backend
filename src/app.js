@@ -12,9 +12,14 @@ app.use(express.json());
 // routes
 app.use('/api', router);
 
-app.get('/', (req, res) => {
-  res.send('Welcome to Deal Krein Backend');
+// app.get('/', (req, res) => {
+//   res.send('Welcome to Deal Krein Backend');
+// });
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
 });
+
 
 // error handler middleware
 app.use(errorHandler);
