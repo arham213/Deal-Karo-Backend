@@ -21,6 +21,10 @@ app.use('/api', router);
 // });
 
 
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Deal Karo Backend is running" });
+});
+
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
