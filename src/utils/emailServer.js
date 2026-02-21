@@ -1,47 +1,28 @@
-import nodemailer from "nodemailer";
+import { Resend } from 'resend';
 
-// const getTransporter = () => {
-//     const transporter = nodemailer.createTransport({
-//         service: "gmail",
-//         auth: {
-//             user: "arhamasjid213@gmail.com",
-//             pass: process.env.GOOGLE_APP_PASSWORD
-//         }
-//     })
-
-//     return transporter;
-// }
-
-const getTransporter = () => {
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.GOOGLE_APP_PASSWORD
-        }
-    });
-
-    return transporter;
-}
-
+const getResendClient = () => {
+    return new Resend(process.env.RESEND_API_KEY);
+};
 
 export const sendEmail = async (to, subject, message) => {
     console.log('sendEmail function called');
 
-    console.log('getting transporter');
-    const transporter = getTransporter();
-    console.log('sending email via transporter:', transporter);
+    const resend = getResendClient();
 
-    const info = await transporter.sendMail({
-        from: 'Deal Krein <arhamasjid213@gmail.com>',
+    console.log('sending email via Resend to:', to);
+
+    const { data, error } = await resend.emails.send({
+        from: 'Deal Karo <onboarding@resend.dev>',
         to: to,
         subject: subject,
         text: message
-    })
+    });
 
-    console.log('email sent with info:', info);
+    if (error) {
+        console.error('Resend EMAIL ERROR:', error);
+        throw new Error(error.message);
+    }
 
-    return info;
-}
+    console.log('email sent with id:', data?.id);
+    return data;
+};

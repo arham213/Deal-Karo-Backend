@@ -33,16 +33,10 @@ setupSocket(io);
 const startServer = async () => {
     await connectDB();
 
-    console.log("process.env.PORT is:", process.env.PORT);
-    const PORT = process.env.PORT;
+    const PORT = process.env.PORT || 8080;
+    console.log("process.env.PORT is:", PORT);
 
-    if (!PORT) {
-        console.error("PORT not provided by host!");
-        process.exit(1);
-    }
-
-
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
         console.log(`Server Running on Port: ${PORT}`);
         console.log(`Socket.IO is ready for connections`);
 
