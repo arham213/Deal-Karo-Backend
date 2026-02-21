@@ -40,18 +40,18 @@ const sendViaBrevo = async (to, subject, message) => {
 // ── Unified sendEmail with fallback ────────────────────────────────────────
 
 export const sendEmail = async (to, subject, message) => {
-    console.log('sendEmail called, trying Resend first...');
+    console.log('sendEmail called, trying Brevo first...');
 
     try {
-        return await sendViaResend(to, subject, message);
-    } catch (resendError) {
-        console.warn('⚠️ Resend failed, falling back to Brevo...', resendError.message);
+        return await sendViaBrevo(to, subject, message);
+    } catch (brevoError) {
+        console.warn('⚠️ Brevo failed, falling back to Resend...', brevoError.message);
 
         try {
-            return await sendViaBrevo(to, subject, message);
-        } catch (brevoError) {
-            console.error('❌ Brevo fallback also failed:', brevoError.message);
-            throw new Error(`All email providers failed. Resend: ${resendError.message} | Brevo: ${brevoError.message}`);
+            return await sendViaResend(to, subject, message);
+        } catch (resendError) {
+            console.error('❌ Resend fallback also failed:', resendError.message);
+            throw new Error(`All email providers failed. Brevo: ${brevoError.message} | Resend: ${resendError.message}`);
         }
     }
 };
