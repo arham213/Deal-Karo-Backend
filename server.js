@@ -46,7 +46,7 @@ const startServer = async () => {
         console.log(`Server Running on Port: ${PORT}`);
         console.log(`Socket.IO is ready for connections`);
 
-        // startCronJobs();
+        startCronJobs();
     });
 }
 
