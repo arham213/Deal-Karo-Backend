@@ -15,8 +15,8 @@ import nodemailer from "nodemailer";
 const getTransporter = () => {
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
+        port: 465,
+        secure: true,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.GOOGLE_APP_PASSWORD
@@ -29,10 +29,10 @@ const getTransporter = () => {
 
 export const sendEmail = async (to, subject, message) => {
     console.log('sendEmail function called');
-    
+
     console.log('getting transporter');
     const transporter = getTransporter();
-    console.log('sending email via transporter:'.transporter);
+    console.log('sending email via transporter:', transporter);
 
     const info = await transporter.sendMail({
         from: 'Deal Krein <arhamasjid213@gmail.com>',
