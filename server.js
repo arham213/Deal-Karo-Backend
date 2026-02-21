@@ -6,6 +6,14 @@ import app from './src/app.js';
 import setupSocket from './src/socket/socketHandler.js';
 import startCronJobs from './src/utils/scheduler.js';
 
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED REJECTION:", err);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:", err);
+});
+
 dotenv.config();
 
 // Create HTTP server from Express app
@@ -28,11 +36,11 @@ const startServer = async () => {
     console.log("process.env.PORT is:", process.env.PORT);
     const PORT = process.env.PORT || 8080;
 
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
         console.log(`Server Running on Port: ${PORT}`);
         console.log(`Socket.IO is ready for connections`);
 
-        startCronJobs();
+        // startCronJobs();
     });
 }
 
