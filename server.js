@@ -7,11 +7,11 @@ import setupSocket from './src/socket/socketHandler.js';
 import startCronJobs from './src/utils/scheduler.js';
 
 process.on("unhandledRejection", (err) => {
-  console.error("UNHANDLED REJECTION:", err);
+    console.error("UNHANDLED REJECTION:", err);
 });
 
 process.on("uncaughtException", (err) => {
-  console.error("UNCAUGHT EXCEPTION:", err);
+    console.error("UNCAUGHT EXCEPTION:", err);
 });
 
 dotenv.config();
@@ -34,9 +34,15 @@ const startServer = async () => {
     await connectDB();
 
     console.log("process.env.PORT is:", process.env.PORT);
-    const PORT = process.env.PORT || 8080;
+    const PORT = process.env.PORT;
 
-    server.listen(PORT, '0.0.0.0', () => {
+    if (!PORT) {
+        console.error("PORT not provided by host!");
+        process.exit(1);
+    }
+
+
+    server.listen(PORT, () => {
         console.log(`Server Running on Port: ${PORT}`);
         console.log(`Socket.IO is ready for connections`);
 

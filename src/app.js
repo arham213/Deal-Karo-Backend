@@ -16,10 +16,9 @@ app.use('/api', router);
 //   res.send('Welcome to Deal Krein Backend');
 // });
 
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+app.get('/', (req, res) => {
+  res.status(200).send('OK');
 });
-
 
 // error handler middleware
 app.use(errorHandler);
