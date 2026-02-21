@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import * as Brevo from '@getbrevo/brevo';
+import Brevo from '@getbrevo/brevo';
 
 // ── Resend ──────────────────────────────────────────────────────────────────
 
