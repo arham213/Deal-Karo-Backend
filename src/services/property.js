@@ -1,6 +1,6 @@
 import { Property, Plot, House, CommercialPlot } from "../models/index.js";
 import { AppError } from "../utils/AppError.js";
-import { del } from "@vercel/blob";
+import { del, put } from "@vercel/blob";
 
 export const getAllProperties = async (page = 1, limit = 10) => {
     // Ensure page and limit are integers
@@ -102,18 +102,113 @@ export const createProperty = async (propertyData) => {
     return newProperty;
 };
 
-export const updateProperty = async (propertyData) => {
-    const property = await Plot.findById(propertyData.propertyId) || await House.findById(propertyData.propertyId);
+export const updateProperty = async (propertyData, file) => {
+    // Use base Property model for lookup (works across all subtypes)
+    const property = await Property.findById(propertyData.propertyId);
 
     if (!property) throw new AppError("Listing not found", 404);
 
-    const Model = getModel(property.type);
+    const newPropertyType = propertyData.propertyType ?? property.propertyType;
+    const NewModel = getModel(newPropertyType);
 
-    const updatedProperty = await Model.findByIdAndUpdate(
-        propertyData.propertyId,
-        propertyData,
+    // ── Duplicate check (same logic as createProperty) ──────────────────────
+    // Merge existing values with incoming update so the check is accurate
+    // even when only some fields are being updated
+    const merged = {
+        plotNo: propertyData.plotNo ?? property.plotNo,
+        houseNo: propertyData.houseNo ?? property.houseNo,
+        propertyType: propertyData.propertyType ?? property.propertyType,
+        listingType: propertyData.listingType ?? property.listingType,
+        phase: propertyData.phase ?? property.phase,
+        block: propertyData.block ?? property.block,
+    };
+
+    const dupQuery = {};
+
+    if (merged.plotNo) {
+        dupQuery.plotNo = merged.plotNo;
+    } else if (merged.houseNo) {
+        dupQuery.houseNo = merged.houseNo;
+    }
+
+    dupQuery.propertyType = merged.propertyType;
+    dupQuery.listingType = merged.listingType;
+    dupQuery.phase = merged.phase;
+    dupQuery.block = merged.block;
+
+    // Exclude the property being updated so it doesn't flag itself
+    dupQuery._id = { $ne: propertyData.propertyId };
+
+    const duplicate = await Property.findOne(dupQuery);
+
+    if (duplicate) throw new AppError("A listing with the same details already exists.", 409);
+    // ────────────────────────────────────────────────────────────────────────
+
+    // Handle image replacement — new file upload takes priority over removeImage
+    if (file) {
+        // Delete old image from Vercel Blob if it exists
+        if (property.imageUrl) {
+            try {
+                await del(property.imageUrl);
+                console.log('Old image deleted from Vercel Blob:', property.imageUrl);
+            } catch (error) {
+                console.error('Failed to delete old image from Vercel Blob:', error.message);
+                // Continue with update even if blob deletion fails
+            }
+        }
+
+        // Upload new image to Vercel Blob
+        const filename = `properties/${Date.now()}-${file.originalname}`;
+        const blob = await put(filename, file.buffer, {
+            access: 'public',
+            contentType: file.mimetype,
+        });
+        propertyData.imageUrl = blob.url;
+        console.log('New image uploaded to Vercel Blob:', blob.url);
+    } else if (propertyData.removeImage === 'true') {
+        // Remove existing image without replacing it
+        if (property.imageUrl) {
+            try {
+                await del(property.imageUrl);
+                console.log('Image removed from Vercel Blob:', property.imageUrl);
+            } catch (error) {
+                console.error('Failed to delete image from Vercel Blob:', error.message);
+            }
+        }
+        propertyData.imageUrl = null;
+    }
+
+    const { propertyId, removeImage, ...updateFields } = propertyData;
+
+    // ── propertyType change: discriminator key cannot be mutated in-place ───
+    // Delete the old document and recreate under the correct discriminator model.
+    if (propertyData.propertyType && propertyData.propertyType !== property.propertyType) {
+        console.log(`propertyType changing '${property.propertyType}' → '${propertyData.propertyType}', migrating document...`);
+
+        const existingData = property.toObject();
+        const { _id, __v, ...existingWithoutMeta } = existingData;
+
+        // Incoming updateFields take priority over existing values
+        const newDocData = {
+            ...existingWithoutMeta,
+            ...updateFields,
+            userId: property.userId, // always preserve owner
+        };
+
+        await property.deleteOne();
+        const newProperty = await NewModel.create(newDocData);
+
+        console.log('Document migrated, new _id:', newProperty._id);
+        return newProperty;
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
+    // Same-type update — normal in-place update
+    const updatedProperty = await NewModel.findByIdAndUpdate(
+        propertyId,
+        updateFields,
         { new: true, runValidators: true }
-    )
+    );
 
     return updatedProperty;
 }

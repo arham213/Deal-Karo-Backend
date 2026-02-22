@@ -104,7 +104,18 @@ export const CreateProperty = async (req, res, next) => {
 
 export const UpdateProperty = async (req, res, next) => {
   try {
-    const property = await updateProperty(req.body);
+    let propertyData = { ...req.body };
+
+    // Parse installment field if sent as JSON string from form-data
+    if (propertyData.installment && typeof propertyData.installment === 'string') {
+      try {
+        propertyData.installment = JSON.parse(propertyData.installment);
+      } catch (e) {
+        console.log('Failed to parse installment field:', e.message);
+      }
+    }
+
+    const property = await updateProperty(propertyData, req.file);
     return successResponse(res, "Property updated successfully", { property }, 200);
   } catch (error) {
     next(error);

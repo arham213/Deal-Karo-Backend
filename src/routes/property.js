@@ -40,10 +40,10 @@ PropertyRouter.get('/:propertyId', validateRequest({ params: propertyIdParamsSch
 // Create a new Property (with image upload support)
 PropertyRouter.post('/', upload.single('image'), CreateProperty);
 
-// Update an Property by ID
-// PropertyRouter.put('/', validateRequest({ body: updatePropertySchema }), UpdateProperty);
+// Update a Property by ID
+PropertyRouter.put('/', upload.single('image'), UpdateProperty);
 
-// Delete an Property by ID
+// Delete a Property by ID
 PropertyRouter.delete('/:propertyId', validateRequest({ params: propertyIdParamsSchema }), DeleteProperty);
 
 export default PropertyRouter;
