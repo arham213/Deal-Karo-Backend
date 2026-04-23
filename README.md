@@ -8,7 +8,7 @@
 
 Shared Node.js REST API serving both the Deal Krein web and mobile applications. Handles authentication, property data, user management, and real-time messaging infrastructure via Socket.IO.
 
-**Web:** [deal-kroo](https://github.com/arham213/deal-kroo) &nbsp;|&nbsp; **Mobile:** [Deal-Karo-Frontend](https://github.com/arham213/Deal-Karo-Frontend)
+**Live:** [backend.dealkroo.com](https://backend.dealkroo.com) &nbsp;|&nbsp;**Web:** [deal-kroo](https://github.com/arham213/deal-kroo) &nbsp;|&nbsp; **Mobile:** [Deal-Karo-Frontend](https://github.com/arham213/Deal-Karo-Frontend)
 
 ---
 
